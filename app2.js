@@ -180,3 +180,19 @@ $('lockBtn').onclick=doUnlock;
  try{navigator.storage?.persist?.()}catch{}
  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 })();
+/* ===== Priedas: režimas be slaptažodžio ===== */
+async function devKey(){let k=await iget('devkey');if(!k){k=await crypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);await iset('devkey',k)}return k}
+async function openDevice(v){try{const k=await iget('devkey');const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:v.iv},k,v.ct);KEY=k;SALT=null;fails=0;V={...blank(),...JSON.parse(td.decode(pt))};afterUnlock()}catch{$('lockErr').textContent='Nepavyko atidaryti duomenų'}}
+async function startNoPass(){if(!confirm('Be slaptažodžio programėlę galės atidaryti kiekvienas, kas paims jūsų atrakintą telefoną. Duomenys telefone vis tiek bus užšifruoti. Tęsti?'))return;
+ KEY=await devKey();SALT=null;V=blank();await saveNow();hasVault=true;afterUnlock()}
+const _showLock=showLock,_doUnlock=doUnlock,_lockNow=lockNow,_settingsPage=settingsPage;
+const npBtn=document.createElement('button');npBtn.id='lockNoPass';npBtn.className='btn w';npBtn.textContent='Naudoti be slaptažodžio';npBtn.onclick=startNoPass;$('lockBtn').after(npBtn);
+showLock=function(){_showLock();$('lockNoPass').hidden=hasVault;if(hasVault)iget('vault').then(v=>{if(v&&!v.salt)openDevice(v)}).catch(()=>{})};
+doUnlock=async function(){if(hasVault){try{const v=await iget('vault');if(v&&!v.salt)return openDevice(v)}catch{}}return _doUnlock()};
+$('lockBtn').onclick=()=>doUnlock();
+lockNow=async function(){if(V&&!SALT){toast('Programėlė naudojama be slaptažodžio, todėl neužrakinama');return}return _lockNow()};
+settingsPage=function(){_settingsPage();const c=document.createElement('div');c.className='card';
+ c.innerHTML=SALT?'<h4>Slaptažodis</h4><div class="row"><div class="t">Įjungtas<small>Programėlė atrakinama slaptažodžiu</small></div><button class="btn" data-act="noPass">Išjungti</button></div>'
+ :'<h4>Slaptažodis</h4><div class="row"><div class="t">Išjungtas<small>Norėdami įjungti, aukščiau esančioje skiltyje „Saugumas ir duomenys“ įrašykite slaptažodį ir paspauskite „Pakeisti slaptažodį“</small></div></div>';
+ pBody.appendChild(c);
+ PH.noPass=async()=>{if(!confirm('Išjungti slaptažodį? Programėlę galės atidaryti kiekvienas, kas turi jūsų telefoną.'))return;KEY=await devKey();SALT=null;await saveNow();toast('Slaptažodis išjungtas');settingsPage()}};
