@@ -1,0 +1,11 @@
+{
+  "name": "Mano AI",
+  "short_name": "Mano AI",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1e1f22",
+  "theme_color": "#1e1f22",
+  "icons": [
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
