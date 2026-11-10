@@ -1,5 +1,6 @@
 'use strict';
 /* Mano AI, 2 dalis. Veikia tik kartu su app.js */
+const APP_VER='v4';
 const okUrl=u=>/^https:\/\/anymodel\.org\/\S*$/.test(u)||/^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}):\d+\/\S*$/.test(u);
 const URLMSG='Adresas turi prasidėti https://anymodel.org/ arba http://localhost / http://192.168.x.x (lokalūs serveriai)';
 const back=()=>{if(history.state&&history.state.o)history.back();else{closeSheet();closePage();closeDrawer();if(LV.on)liveStop()}};
@@ -26,7 +27,7 @@ function libraryPage(tab){tab=tab==='file'?'file':'img';const it=[];
 function settingsPage(){const has=!!V.key,vl=cfg.voiceLang.slice(0,2).toLowerCase();
  const vs=voices().filter(v=>v.lang.replace('_','-').toLowerCase().startsWith(vl));
  const ed=epEdit&&cfg.eps.find(x=>x.id===epEdit);
- const F=[['facts','Faktai'],['links','Mano nuorodos'],['reminders','Priminimai'],['skills','Įgūdžiai'],['projects','Projektų instrukcijos'],['history','Išsaugoti pokalbių istoriją'],['mic','Mikrofonas'],['camera','Kamera'],['imageGen','Nuotraukų kūrimas'],['speak','Live atsako balsu'],['enter','Enter mygtukas siunčia žinutę'],['autolock','Užrakinti po 5 min. nenaudojimo']];
+ const F=[['facts','Faktai'],['links','Mano nuorodos'],['reminders','Priminimai'],['skills','Įgūdžiai'],['projects','Projektų instrukcijos'],['history','Išsaugoti pokalbių istoriją'],['mic','Mikrofonas'],['camera','Kamera'],['imageGen','Nuotraukų kūrimas'],['speak','Live atsako balsu'],['enter','Enter mygtukas siunčia žinutę'],['autolock','Užrakinti po 5 min. nenaudojimo (tik su slaptažodžiu)']];
  openPage('settings','Nustatymai',`
 <div class="card"><h4>API raktas</h4><div class="row col">
 <div class="keystate ${has?'ok':'no'}">${ic(has?'lock':'unlock')}${has?'Raktas išsaugotas ir užšifruotas (…'+esc(V.key.slice(-4))+')':'Raktas neįvestas'}</div>
@@ -107,7 +108,11 @@ ${cfg.eps.map(x=>`<div class="item${x.id===cfg.ep?' sel':''}" data-act="ep" data
  input:t=>{if(t.id==='s_fs'){cfg.fs=+t.value;$('fsv').textContent=t.value;applyLook();saveCfg()}
   if(t.id==='s_rate'){cfg.rate=+t.value;$('rv').textContent=t.value;saveCfg()}
   if(t.id==='s_color'){cfg.accent=t.value;applyLook();saveCfg()}},
- ch:t=>{if(t.id==='s_voice')cfg.voice=t.value;if(t.id==='s_alang')cfg.answerLang=t.value;if(t.id==='s_img')cfg.imgModel=t.value;saveCfg()}})}
+ ch:t=>{if(t.id==='s_voice')cfg.voice=t.value;if(t.id==='s_alang')cfg.answerLang=t.value;if(t.id==='s_img')cfg.imgModel=t.value;saveCfg()}});
+ /* Versijos užrašas pačioje apačioje (po visų kitų skilčių) */
+ queueMicrotask(()=>{if(curPage!=='settings')return;$('verFoot')?.remove();const p=document.createElement('p');p.id='verFoot';
+  p.style.cssText='text-align:center;color:var(--mu);font-size:.75rem;margin:20px 0 0;padding:12px 0 0;border-top:1px solid var(--ln)';
+  p.textContent='Mano AI · Versija '+APP_VER;pBody.appendChild(p)})}
 
 /* ===== Importavimas ===== */
 $('fImport').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f||!impTarget||!V)return;
@@ -133,7 +138,8 @@ function showLock(){$('lock').hidden=false;$('lockPass').value='';$('lockErr').t
 async function doUnlock(){const p=$('lockPass').value,err=$('lockErr');
  if(Date.now()<waitUntil){err.textContent='Palaukite '+Math.ceil((waitUntil-Date.now())/1000)+' s';return}
  $('lockBtn').disabled=true;err.textContent='';
- try{const v=await iget('vault');const k=await derive(p,v.salt);let pt;
+ try{const v=await iget('vault');if(!v||!v.salt)throw new Error('Duomenų nerasta. Spauskite „Pamiršau slaptažodį“.');
+  const k=await derive(p,v.salt);let pt;
   try{pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:v.iv},k,v.ct)}catch{fails++;waitUntil=Date.now()+Math.min(60,2**fails)*1000;throw new Error('Neteisingas slaptažodis')}
   SALT=v.salt;KEY=k;fails=0;V={...blank(),...JSON.parse(td.decode(pt))};afterUnlock()}
  catch(e){err.textContent=e.message}finally{$('lockBtn').disabled=false}}
@@ -145,6 +151,10 @@ async function lockNow(){if(!V)return;if(!SALT){toast('Slaptažodis išjungtas')
 document.addEventListener('visibilitychange',()=>{if(document.hidden){hiddenAt=Date.now();if(V)saveNow()}
  else if(cfg.f.autolock&&V&&hiddenAt&&Date.now()-hiddenAt>3e5&&SALT)lockNow()});
 setInterval(()=>{if(cfg.f.autolock&&V&&!busy&&!LV.on&&SALT&&Date.now()-lastAct>3e5)lockNow()},3e4);
+
+/* Meniu: „Užrakinti“ rodomas tik kai slaptažodis įjungtas */
+const _renderDrawer=renderDrawer;
+renderDrawer=function(){_renderDrawer();if(!SALT){const l=drawerEl.querySelector('[data-id="lock"]');if(l)l.hidden=true}};
 
 /* ===== Mygtukai ir įvykiai ===== */
 $('bGo').onclick=()=>{if(busy){if(ctrl)ctrl.abort();return}if(inputEl.value.trim()||pending.length)send();else liveStart()};
@@ -171,7 +181,7 @@ liveEl.addEventListener('click',e=>{if(!e.target.closest('.lb')&&'speechSynthesi
 addEventListener('popstate',()=>{if(!sheetEl.hidden)closeSheet();else if(!liveEl.hidden)liveStop();else if(!pageEl.hidden)closePage();else if(drawerEl.classList.contains('open'))closeDrawer();
  if(!sheetEl.hidden||!liveEl.hidden||!pageEl.hidden||drawerEl.classList.contains('open'))pushO()});
 if('speechSynthesis' in window)speechSynthesis.onvoiceschanged=()=>{if(curPage==='settings')settingsPage()};
-$('lockBtn').onclick=doUnlock;
+$('lockBtn').onclick=()=>doUnlock();
 $('lockPass').addEventListener('keydown',e=>{if(e.key==='Enter')doUnlock()});
 
 /* ===== Paleidimas ===== */
