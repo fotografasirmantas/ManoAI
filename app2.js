@@ -1,7 +1,7 @@
 'use strict';
 /* Mano AI, 2 dalis. Veikia tik kartu su app.js */
-const okUrl=u=>/^https:\/\/anymodel\.org\/\S*$/.test(u);
-const URLMSG='Adresas turi prasidėti https://anymodel.org/ (kiti serveriai užblokuoti saugumo sumetimais)';
+const okUrl=u=>/^https:\/\/anymodel\.org\/\S*$/.test(u)||/^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}):\d+\/\S*$/.test(u);
+const URLMSG='Adresas turi prasidėti https://anymodel.org/ arba http://localhost / http://192.168.x.x (lokalūs serveriai)';
 const back=()=>{if(history.state&&history.state.o)history.back();else{closeSheet();closePage();closeDrawer();if(LV.on)liveStop()}};
 const act=(e,H)=>{const b=e.target.closest('[data-act]');if(b&&H&&H[b.dataset.act])H[b.dataset.act](b.dataset.id,b)};
 
