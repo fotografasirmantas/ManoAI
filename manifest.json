@@ -2,10 +2,12 @@
   "name": "Mano AI",
   "short_name": "Mano AI",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#e8f0fe",
-  "theme_color": "#1a73e8",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
