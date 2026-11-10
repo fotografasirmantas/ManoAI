@@ -3,71 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f4f1fb" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#14131a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#e8f0fe" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131314" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-512.png">
 <title>Mano AI</title>
 <style>
-:root{--bg:#f4f1fb;--surface:#fff;--surface2:#ece8f6;--txt:#1d1b26;--mut:#7a7590;--line:#e2dcf0;--err:#d6455d;
- --grad:linear-gradient(135deg,#7c5cff,#ff6fa5)}
-@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#14131a;--surface:#1f1d28;--surface2:#2a2735;--txt:#eeeaf8;--mut:#9c97b0;--line:#2f2c3b;--err:#ff7a90}}
+:root{--bg:#e8f0fe;--surface:#fff;--surface2:#f1f3f4;--txt:#202124;--mut:#5f6368;--line:#dadce0;--err:#d93025;
+ --grad:linear-gradient(135deg,#1a73e8,#34a853);--primary:#1a73e8}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#131314;--surface:#1f1f1f;--surface2:#292a2d;--txt:#e8eaed;--mut:#9aa0a6;--line:#3c4043;--err:#f28b82;--primary:#8ab4f8}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--txt);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;
  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-header{display:flex;align-items:center;gap:10px;padding:12px 14px}
-.logo{width:40px;height:40px;border-radius:13px;background:var(--grad);display:grid;place-items:center;color:#fff;font-size:20px;flex:none;box-shadow:0 4px 14px rgba(124,92,255,.35)}
+header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+.logo{width:40px;height:40px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-size:20px;flex:none}
 .titles{flex:1;min-width:0}
 .titles b{display:block;font-size:17px;line-height:1.2}
 .pick{position:relative;display:inline-block;max-width:100%}
-.pick select{appearance:none;-webkit-appearance:none;border:0;background:var(--surface2);color:var(--mut);font:inherit;font-size:13px;padding:3px 26px 3px 10px;border-radius:99px;max-width:100%}
-.pick::after{content:"▾";position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:12px;pointer-events:none}
-.icon{width:42px;height:42px;border-radius:13px;border:0;background:var(--surface);color:var(--txt);font-size:19px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.pick select{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--mut);font:inherit;font-size:13px;padding:3px 20px 3px 0;max-width:100%}
+.pick::after{content:"▾";position:absolute;right:0;top:50%;transform:translateY(-50%);color:var(--mut);font-size:12px;pointer-events:none}
+.icon{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:var(--txt);font-size:19px;flex:none}
 #chat{flex:1;overflow-y:auto;padding:8px 14px 16px;display:flex;flex-direction:column;gap:14px}
-.row{display:flex;gap:8px;align-items:flex-end;animation:pop .25s ease}
+.row{display:flex;gap:8px;align-items:flex-start;animation:pop .25s ease}
 .row.user{justify-content:flex-end}
-.av{width:30px;height:30px;border-radius:50%;background:var(--grad);flex:none;display:grid;place-items:center;font-size:15px;color:#fff}
-.bubble{max-width:82%;padding:11px 15px;border-radius:20px;overflow-wrap:anywhere}
-.user .bubble{background:var(--grad);color:#fff;border-bottom-right-radius:6px;white-space:pre-wrap}
-.assistant .bubble{background:var(--surface);border-bottom-left-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.av{width:32px;height:32px;border-radius:50%;background:var(--grad);flex:none;display:grid;place-items:center;font-size:16px;color:#fff;margin-top:4px}
+.bubble{max-width:80%;padding:10px 14px;border-radius:18px;overflow-wrap:anywhere;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.user .bubble{background:var(--primary);color:#fff}
 .bubble p{margin:0 0 .6em}.bubble p:last-child{margin:0}
-.bubble pre{background:var(--surface2);padding:10px;border-radius:10px;overflow-x:auto;font-size:13px;margin:.4em 0}
+.bubble pre{background:var(--surface2);padding:10px;border-radius:8px;overflow-x:auto;font-size:13px;margin:.4em 0}
 .bubble code{font-family:ui-monospace,Menlo,monospace;font-size:.9em}
-.err .bubble{color:var(--err)}
+.bubble img{max-width:100%;border-radius:12px;margin:8px 0}
+.err .bubble{background:var(--surface);color:var(--err)}
 .dots span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--mut);animation:b 1.2s infinite}
 .dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
 @keyframes b{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
 @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 #empty{margin:auto;text-align:center;padding:20px;max-width:340px;width:100%}
-#empty .logo{width:76px;height:76px;border-radius:26px;margin:0 auto 16px;font-size:38px}
-#empty h2{margin:0 0 6px;font-size:23px}
-#empty p{color:var(--mut);margin:0 0 20px}
-.sugg{display:flex;flex-direction:column;gap:8px}
-.sugg button{border:1px solid var(--line);background:var(--surface);color:var(--txt);padding:13px 15px;border-radius:16px;text-align:left;font:inherit;font-size:15px}
-footer{padding:8px 12px 12px}
-.composer{display:flex;align-items:flex-end;gap:8px;background:var(--surface);border-radius:28px;padding:6px 6px 6px 18px;box-shadow:0 2px 14px rgba(0,0,0,.08);border:1px solid var(--line)}
-#input{flex:1;border:0;outline:0;resize:none;background:transparent;color:var(--txt);font:inherit;padding:9px 0;max-height:140px}
-#send{width:44px;height:44px;border-radius:50%;border:0;background:var(--grad);color:#fff;font-size:18px;flex:none}
+#empty .logo{width:72px;height:72px;margin:0 auto 16px;font-size:36px}
+#empty h2{margin:0 0 6px;font-size:22px}
+#empty p{color:var(--mut);margin:0 0 20px;font-size:15px}
+.sugg{display:grid;gap:8px}
+.sugg button{border:1px solid var(--line);background:var(--surface);color:var(--txt);padding:12px 14px;border-radius:12px;text-align:left;font:inherit;font-size:14px}
+footer{padding:8px 12px 12px;background:var(--surface);border-top:1px solid var(--line)}
+.composer{display:flex;align-items:flex-end;gap:6px}
+.tools{display:flex;gap:4px}
+.tools button{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:var(--mut);font-size:20px;flex:none}
+.tools button.recording{color:#ea4335;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+#inputWrap{flex:1;position:relative}
+#input{width:100%;border:1px solid var(--line);outline:0;resize:none;background:var(--surface);color:var(--txt);font:inherit;padding:10px 12px;border-radius:24px;max-height:120px}
+#send{width:40px;height:40px;border-radius:50%;border:0;background:var(--primary);color:#fff;font-size:18px;flex:none}
 #send:disabled{opacity:.4}
-dialog{border:0;padding:22px;background:var(--surface);color:var(--txt);width:100%;max-width:520px;margin:auto auto 0;border-radius:26px 26px 0 0;
- padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
-dialog::backdrop{background:rgba(10,8,20,.45);backdrop-filter:blur(3px)}
-dialog h3{margin:0 0 4px;font-size:20px}
-.field{display:block;margin:12px 0;font-size:13px;color:var(--mut)}
-.field input,.field textarea{display:block;width:100%;margin-top:5px;padding:11px 13px;border-radius:13px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font:inherit;font-size:15px}
-.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
-.btns button{border:0;border-radius:14px;padding:13px;font:inherit;font-size:15px;background:var(--surface2);color:var(--txt)}
-.btns .primary{background:var(--grad);color:#fff;grid-column:1/-1;font-weight:600}
+#fileList{font-size:12px;color:var(--mut);margin-top:4px;display:flex;flex-wrap:wrap;gap:4px}
+#fileList span{background:var(--surface2);padding:4px 8px;border-radius:8px}
+dialog{border:0;padding:0;background:var(--surface);color:var(--txt);width:100%;max-width:520px;margin:auto auto 0;border-radius:20px 20px 0 0;
+ max-height:90vh;overflow:hidden}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.dhead{padding:20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.dhead h3{margin:0;font-size:20px}
+.dhead button{border:0;background:transparent;font-size:24px;color:var(--mut);width:32px;height:32px;border-radius:50%}
+.dbody{padding:20px;overflow-y:auto;max-height:calc(90vh - 140px)}
+.field{display:block;margin:16px 0;font-size:14px;color:var(--txt)}
+.field label{display:block;margin-bottom:6px;font-weight:500}
+.field input,.field textarea,.field select{display:block;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font:inherit;font-size:15px}
+.field small{color:var(--mut);font-size:12px;display:block;margin-top:4px}
+.btns{display:grid;gap:8px;margin-top:20px;padding:16px 20px;border-top:1px solid var(--line)}
+.btns button{border:0;border-radius:10px;padding:12px;font:inherit;font-size:15px;background:var(--surface2);color:var(--txt)}
+.btns .primary{background:var(--primary);color:#fff;font-weight:600}
+.langs{display:flex;gap:8px;margin:16px 0}
+.langs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--surface);color:var(--txt);border-radius:10px;font:inherit}
+.langs button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo">✨</div>
+  <div class="logo">🤖</div>
   <div class="titles">
-    <b>Mano AI</b>
+    <b id="appName">Mano AI</b>
     <label class="pick"><select id="model" aria-label="Modelis"></select></label>
   </div>
+  <button class="icon" id="langBtn" aria-label="Kalba">🌐</button>
   <button class="icon" id="setBtn" aria-label="Nustatymai">⚙️</button>
 </header>
 
@@ -75,41 +91,114 @@ dialog h3{margin:0 0 4px;font-size:20px}
 
 <footer>
   <div class="composer">
-    <textarea id="input" rows="1" placeholder="Paklausk ko nori…"></textarea>
+    <div class="tools">
+      <button id="micBtn" aria-label="Mikrofonas">🎤</button>
+      <label style="width:40px;height:40px;display:grid;place-items:center;cursor:pointer">
+        <input type="file" id="fileBtn" multiple accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt" style="display:none">
+        <span style="font-size:20px;color:var(--mut)">📎</span>
+      </label>
+    </div>
+    <div id="inputWrap">
+      <textarea id="input" rows="1" placeholder="Rašykite žinutę…"></textarea>
+      <div id="fileList"></div>
+    </div>
     <button id="send" aria-label="Siųsti">➤</button>
   </div>
 </footer>
 
-<dialog id="settings">
-  <h3>Nustatymai</h3>
-  <label class="field">API adresas
-    <input id="baseUrl" placeholder="https://…/v1"></label>
-  <label class="field">API raktas
-    <input id="apiKey" type="password" autocomplete="off"></label>
-  <label class="field">Modeliai (po vieną eilutėje)
-    <textarea id="models" rows="4"></textarea></label>
-  <div class="btns">
-    <button id="save" class="primary">Išsaugoti</button>
-    <button id="fetchModels">Gauti modelius</button>
-    <button id="clear">Naujas pokalbis</button>
-    <button id="close" style="grid-column:1/-1">Uždaryti</button>
+<dialog id="langDialog">
+  <div class="dhead"><h3 id="langTitle">Kalba</h3><button onclick="langDialog.close()">✕</button></div>
+  <div class="dbody">
+    <div class="langs">
+      <button data-lang="lt">🇱🇹 Lietuvių</button>
+      <button data-lang="en">🇬🇧 English</button>
+      <button data-lang="ru">🇷🇺 Русский</button>
+    </div>
   </div>
 </dialog>
 
+<dialog id="settings">
+  <div class="dhead"><h3 id="setTitle">Nustatymai</h3><button onclick="settings.close()">✕</button></div>
+  <div class="dbody">
+    <div class="field">
+      <label id="lbl1">API adresas</label>
+      <select id="endpoint">
+        <option value="https://anymodel.org/v1/chat/completions">Chat (default)</option>
+        <option value="https://anymodel.org/v1/messages">Claude messages</option>
+        <option value="https://anymodel.org/v1/responses">Responses</option>
+      </select>
+      <small id="sm1">Pasirinkite pagal jūsų AI modelį</small>
+    </div>
+    <div class="field">
+      <label id="lbl2">API raktas</label>
+      <input id="apiKey" type="password" autocomplete="off">
+      <small id="sm2">Užšifruojamas 256-bit AES</small>
+    </div>
+    <div class="field">
+      <label id="lbl3">Slaptažodis raktui</label>
+      <input id="passphrase" type="password" autocomplete="new-password">
+      <small id="sm3">Žinote tik jūs, be jo raktas neveiks</small>
+    </div>
+    <div class="field">
+      <label id="lbl4">Modeliai (po vieną eilutėje)</label>
+      <textarea id="models" rows="4"></textarea>
+    </div>
+  </div>
+  <div class="btns">
+    <button id="save" class="primary">Išsaugoti</button>
+    <button id="fetchModels">Gauti modelius</button>
+    <button id="clear">Išvalyti pokalbį</button>
+  </div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const S = {
   get: k => { try { return localStorage.getItem(k); } catch { return null; } },
   set: (k, v) => { try { localStorage.setItem(k, v); } catch {} }
 };
-const DEFAULT_MODELS = "claude-opus-5-5\nclaude-sonnet-5-5\nclaude-haiku-5-5";
-const SUGG = ["Padėk sugalvoti nuotraukos aprašymą Instagramui", "Kokios geriausios fotografavimo vietos Lietuvoje?", "Paaiškink paprastai, kas yra diafragma"];
+const DEFAULT_MODELS = "claude-opus-5-5\nclaude-sonnet-5-5\ngpt-4o\ngpt-4o-mini\ngemini-2.0-flash-exp\ngemini-exp-1206";
+const T = {
+  lt: { appName: 'Mano AI', placeholder: 'Rašykite žinutę…', sugg: ['Padėk sugalvoti nuotraukos aprašymą', 'Geriausios fotografavimo vietos Lietuvoje?', 'Paaiškink, kas yra diafragma'], emptyTitle: 'Labas! 👋', emptyDesc: 'Ką šiandien veiksime?', setTitle: 'Nustatymai', langTitle: 'Kalba', lbl1: 'API adresas', lbl2: 'API raktas', lbl3: 'Slaptažodis raktui', lbl4: 'Modeliai (po vieną eilutėje)', sm1: 'Pasirinkite pagal jūsų AI modelį', sm2: 'Užšifruojamas 256-bit AES', sm3: 'Žinote tik jūs, be jo raktas neveiks', save: 'Išsaugoti', fetchModels: 'Gauti modelius', clear: 'Išvalyti pokalbį', err: 'Klaida', listening: 'Klausomasi…' },
+  en: { appName: 'My AI', placeholder: 'Type a message…', sugg: ['Help me write a photo caption', 'Best photo spots in Lithuania?', 'Explain aperture simply'], emptyTitle: 'Hello! 👋', emptyDesc: 'What shall we do today?', setTitle: 'Settings', langTitle: 'Language', lbl1: 'API endpoint', lbl2: 'API key', lbl3: 'Passphrase for key', lbl4: 'Models (one per line)', sm1: 'Choose based on your AI model', sm2: 'Encrypted with 256-bit AES', sm3: 'Only you know it, key won't work without it', save: 'Save', fetchModels: 'Fetch models', clear: 'Clear chat', err: 'Error', listening: 'Listening…' },
+  ru: { appName: 'Мой AI', placeholder: 'Напишите сообщение…', sugg: ['Помоги написать подпись к фото', 'Лучшие места для фото в Литве?', 'Объясни, что такое диафрагма'], emptyTitle: 'Привет! 👋', emptyDesc: 'Что будем делать сегодня?', setTitle: 'Настройки', langTitle: 'Язык', lbl1: 'API адрес', lbl2: 'API ключ', lbl3: 'Пароль для ключа', lbl4: 'Модели (по одной на строку)', sm1: 'Выберите по вашей AI модели', sm2: 'Шифруется 256-bit AES', sm3: 'Знаете только вы, без него ключ не работает', save: 'Сохранить', fetchModels: 'Получить модели', clear: 'Очистить чат', err: 'Ошибка', listening: 'Слушаю…' }
+};
+let lang = S.get('lang') || 'lt';
 let history = [];
 try { history = JSON.parse(S.get('history') || '[]'); } catch { history = []; }
+let files = [];
+let recognition;
 
-function md(t) {
+function t(key) { return T[lang][key] || key; }
+function updateLang() {
+  document.documentElement.lang = lang;
+  $('appName').textContent = t('appName');
+  $('input').placeholder = t('placeholder');
+  $('setTitle').textContent = t('setTitle');
+  $('langTitle').textContent = t('langTitle');
+  $('lbl1').textContent = t('lbl1');
+  $('lbl2').textContent = t('lbl2');
+  $('lbl3').textContent = t('lbl3');
+  $('lbl4').textContent = t('lbl4');
+  $('sm1').textContent = t('sm1');
+  $('sm2').textContent = t('sm2');
+  $('sm3').textContent = t('sm3');
+  $('save').textContent = t('save');
+  $('fetchModels').textContent = t('fetchModels');
+  $('clear').textContent = t('clear');
+  document.querySelectorAll('.langs button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  render();
+}
+function encryptKey(key, pass) {
+  return CryptoJS.AES.encrypt(key, pass).toString();
+}
+function decryptKey(enc, pass) {
+  try { return CryptoJS.AES.decrypt(enc, pass).toString(CryptoJS.enc.Utf8); } catch { return ''; }
+}
+function md(txt) {
   const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  return String(t).split('```').map((p, i) => {
+  return String(txt).split('```').map((p, i) => {
     if (i % 2) return '<pre><code>' + esc(p.replace(/^[^\n]*\n/, '')) + '</code></pre>';
     return esc(p).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
       .split(/\n{2,}/).map(x => x.trim() ? '<p>' + x.trim().replace(/\n/g, '<br>') + '</p>' : '').join('');
@@ -123,19 +212,27 @@ function fillModels() {
   if (last && list.includes(last)) $('model').value = last;
 }
 function openSettings() {
-  $('baseUrl').value = S.get('baseUrl') || '';
-  $('apiKey').value = S.get('apiKey') || '';
+  $('endpoint').value = S.get('endpoint') || 'https://anymodel.org/v1/chat/completions';
+  $('apiKey').value = '';
+  $('passphrase').value = '';
   $('models').value = S.get('models') || DEFAULT_MODELS;
   $('settings').showModal();
 }
-function add(role, text) {
+function add(role, content, isImage) {
   $('empty')?.remove();
   const row = document.createElement('div');
   row.className = 'row ' + role;
   const b = document.createElement('div');
   b.className = 'bubble';
-  if (role === 'user') b.textContent = text;
-  else { const av = document.createElement('div'); av.className = 'av'; av.textContent = '✨'; row.appendChild(av); b.innerHTML = md(text); }
+  if (role === 'assistant') {
+    const av = document.createElement('div');
+    av.className = 'av';
+    av.textContent = '🤖';
+    row.appendChild(av);
+  }
+  if (isImage) b.innerHTML = '<img src="' + content + '" alt="Generated">';
+  else if (role === 'user') b.textContent = content;
+  else b.innerHTML = md(content);
   row.appendChild(b);
   $('chat').appendChild(row);
   $('chat').scrollTop = $('chat').scrollHeight;
@@ -146,44 +243,75 @@ function render() {
   if (!history.length) {
     const e = document.createElement('div');
     e.id = 'empty';
-    e.innerHTML = '<div class="logo">✨</div><h2>Labas! 👋</h2><p>Ką šiandien veiksime?</p><div class="sugg"></div>';
-    SUGG.forEach(s => {
+    e.innerHTML = '<div class="logo">🤖</div><h2>' + t('emptyTitle') + '</h2><p>' + t('emptyDesc') + '</p><div class="sugg"></div>';
+    t('sugg').forEach(s => {
       const btn = document.createElement('button');
       btn.textContent = s;
       btn.onclick = () => { $('input').value = s; send(); };
       e.querySelector('.sugg').appendChild(btn);
     });
     $('chat').appendChild(e);
-  } else history.forEach(m => add(m.role, m.content));
+  } else history.forEach(m => {
+    if (m.image) add(m.role, m.content, true);
+    else add(m.role, m.content);
+  });
 }
-function base() { return (S.get('baseUrl') || '').replace(/\/+$/, ''); }
-function grow() { const t = $('input'); t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
-
+function grow() {
+  const inp = $('input');
+  inp.style.height = 'auto';
+  inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
+}
+async function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
 async function send() {
   const text = $('input').value.trim();
-  if (!text) return;
-  if (!base() || !S.get('apiKey')) { openSettings(); return; }
-  $('input').value = ''; grow();
-  history.push({ role: 'user', content: text });
-  add('user', text);
+  if (!text && !files.length) return;
+  const enc = S.get('apiKey');
+  const pass = S.get('passphrase');
+  if (!enc || !pass) { openSettings(); return; }
+  const key = decryptKey(enc, pass);
+  if (!key) { alert(t('err') + ': ' + (lang === 'ru' ? 'неверный пароль' : lang === 'en' ? 'wrong passphrase' : 'neteisingas slaptažodis')); return; }
+  $('input').value = '';
+  $('fileList').innerHTML = '';
+  grow();
+  const msg = { role: 'user', content: text };
+  if (files.length) {
+    msg.files = await Promise.all(files.map(async f => ({ name: f.name, data: await toBase64(f) })));
+  }
+  history.push(msg);
+  add('user', text + (files.length ? ' 📎×' + files.length : ''));
+  files = [];
   const el = add('assistant', '');
   el.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
   $('send').disabled = true;
   try {
-    const r = await fetch(base() + '/chat/completions', {
+    const endpoint = S.get('endpoint') || 'https://anymodel.org/v1/chat/completions';
+    const body = { model: $('model').value, messages: history.map(m => ({ role: m.role, content: m.content })) };
+    const r = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + S.get('apiKey') },
-      body: JSON.stringify({ model: $('model').value, messages: history })
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify(body)
     });
     const d = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(d.error?.message || ('HTTP ' + r.status));
-    const ans = d.choices?.[0]?.message?.content ?? '(tuščias atsakymas)';
-    history.push({ role: 'assistant', content: ans });
-    el.innerHTML = md(ans);
+    const ans = d.choices?.[0]?.message?.content || d.content?.[0]?.text || d.response || '(empty)';
+    if (d.image_url) {
+      history.push({ role: 'assistant', content: d.image_url, image: true });
+      el.innerHTML = '<img src="' + d.image_url + '" alt="Generated">';
+    } else {
+      history.push({ role: 'assistant', content: ans });
+      el.innerHTML = md(ans);
+    }
     S.set('history', JSON.stringify(history));
   } catch (e) {
     history.pop();
-    el.textContent = 'Klaida: ' + e.message;
+    el.textContent = t('err') + ': ' + e.message;
     el.parentElement.classList.add('err');
   }
   $('send').disabled = false;
@@ -193,30 +321,71 @@ async function send() {
 $('send').onclick = send;
 $('input').addEventListener('input', grow);
 $('input').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) { e.preventDefault(); send(); }
+  if (e.key === 'Enter' && !e.shiftKey && window.innerWidth > 600) { e.preventDefault(); send(); }
 });
 $('setBtn').onclick = openSettings;
-$('close').onclick = () => $('settings').close();
+$('langBtn').onclick = () => $('langDialog').showModal();
 $('model').onchange = () => S.set('lastModel', $('model').value);
 $('save').onclick = () => {
-  S.set('baseUrl', $('baseUrl').value.trim());
-  S.set('apiKey', $('apiKey').value.trim());
+  const key = $('apiKey').value.trim();
+  const pass = $('passphrase').value.trim();
+  if (key && pass) S.set('apiKey', encryptKey(key, pass));
+  if (pass) S.set('passphrase', pass);
+  S.set('endpoint', $('endpoint').value);
   S.set('models', $('models').value.trim());
   fillModels();
   $('settings').close();
 };
 $('fetchModels').onclick = async () => {
   try {
-    const url = $('baseUrl').value.trim().replace(/\/+$/, '');
-    const r = await fetch(url + '/models', { headers: { 'Authorization': 'Bearer ' + $('apiKey').value.trim() } });
+    const enc = S.get('apiKey');
+    const pass = $('passphrase').value.trim() || S.get('passphrase');
+    if (!enc || !pass) { alert(t('err')); return; }
+    const key = decryptKey(enc, pass);
+    const r = await fetch('https://anymodel.org/v1/models', { headers: { 'Authorization': 'Bearer ' + key } });
     const d = await r.json();
     $('models').value = (d.data || []).map(m => m.id).join('\n');
-  } catch (e) { alert('Nepavyko gauti modelių: ' + e.message); }
+  } catch (e) { alert(t('err') + ': ' + e.message); }
 };
-$('clear').onclick = () => { history = []; S.set('history', '[]'); render(); $('settings').close(); };
+$('clear').onclick = () => {
+  history = [];
+  S.set('history', '[]');
+  render();
+  $('settings').close();
+};
+document.querySelectorAll('.langs button').forEach(b => {
+  b.onclick = () => { lang = b.dataset.lang; S.set('lang', lang); updateLang(); $('langDialog').close(); };
+});
+$('fileBtn').onchange = e => {
+  files = Array.from(e.target.files);
+  $('fileList').innerHTML = files.map(f => '<span>' + f.name + '</span>').join('');
+};
+$('micBtn').onclick = () => {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    alert(lang === 'ru' ? 'Микрофон не поддерживается' : lang === 'en' ? 'Microphone not supported' : 'Mikrofonas nepalaikomas');
+    return;
+  }
+  if (!recognition) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onresult = e => {
+      $('input').value = e.results[0][0].transcript;
+      grow();
+      $('micBtn').classList.remove('recording');
+    };
+    recognition.onerror = () => $('micBtn').classList.remove('recording');
+    recognition.onend = () => $('micBtn').classList.remove('recording');
+  }
+  const codes = { lt: 'lt-LT', en: 'en-US', ru: 'ru-RU' };
+  recognition.lang = codes[lang] || 'lt-LT';
+  recognition.start();
+  $('micBtn').classList.add('recording');
+};
 
 fillModels();
-render();
+updateLang();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 </script>
 </body>
