@@ -2,117 +2,169 @@
 <html lang="lt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#e8f0fe" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#131314" media="(prefers-color-scheme: dark)">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#d3e3fd">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-512.png">
 <title>Mano AI</title>
 <style>
-:root{--bg:#e8f0fe;--surface:#fff;--surface2:#f1f3f4;--txt:#202124;--mut:#5f6368;--line:#dadce0;--err:#d93025;
- --grad:linear-gradient(135deg,#1a73e8,#34a853);--primary:#1a73e8}
-@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#131314;--surface:#1f1f1f;--surface2:#292a2d;--txt:#e8eaed;--mut:#9aa0a6;--line:#3c4043;--err:#f28b82;--primary:#8ab4f8}}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--txt);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;
- padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
-.logo{width:40px;height:40px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-size:20px;flex:none}
-.titles{flex:1;min-width:0}
-.titles b{display:block;font-size:17px;line-height:1.2}
-.pick{position:relative;display:inline-block;max-width:100%}
-.pick select{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--mut);font:inherit;font-size:13px;padding:3px 20px 3px 0;max-width:100%}
-.pick::after{content:"▾";position:absolute;right:0;top:50%;transform:translateY(-50%);color:var(--mut);font-size:12px;pointer-events:none}
-.icon{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:var(--txt);font-size:19px;flex:none}
-#chat{flex:1;overflow-y:auto;padding:8px 14px 16px;display:flex;flex-direction:column;gap:14px}
-.row{display:flex;gap:8px;align-items:flex-start;animation:pop .25s ease}
-.row.user{justify-content:flex-end}
-.av{width:32px;height:32px;border-radius:50%;background:var(--grad);flex:none;display:grid;place-items:center;font-size:16px;color:#fff;margin-top:4px}
-.bubble{max-width:80%;padding:10px 14px;border-radius:18px;overflow-wrap:anywhere;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.1)}
-.user .bubble{background:var(--primary);color:#fff}
-.bubble p{margin:0 0 .6em}.bubble p:last-child{margin:0}
-.bubble pre{background:var(--surface2);padding:10px;border-radius:8px;overflow-x:auto;font-size:13px;margin:.4em 0}
-.bubble code{font-family:ui-monospace,Menlo,monospace;font-size:.9em}
-.bubble img{max-width:100%;border-radius:12px;margin:8px 0}
-.err .bubble{background:var(--surface);color:var(--err)}
-.dots span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--mut);animation:b 1.2s infinite}
-.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
-@keyframes b{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
-@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-#empty{margin:auto;text-align:center;padding:20px;max-width:340px;width:100%}
-#empty .logo{width:72px;height:72px;margin:0 auto 16px;font-size:36px}
-#empty h2{margin:0 0 6px;font-size:22px}
-#empty p{color:var(--mut);margin:0 0 20px;font-size:15px}
-.sugg{display:grid;gap:8px}
-.sugg button{border:1px solid var(--line);background:var(--surface);color:var(--txt);padding:12px 14px;border-radius:12px;text-align:left;font:inherit;font-size:14px}
-footer{padding:8px 12px 12px;background:var(--surface);border-top:1px solid var(--line)}
-.composer{display:flex;align-items:flex-end;gap:6px}
-.tools{display:flex;gap:4px}
-.tools button{width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:var(--mut);font-size:20px;flex:none}
-.tools button.recording{color:#ea4335;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-#inputWrap{flex:1;position:relative}
-#input{width:100%;border:1px solid var(--line);outline:0;resize:none;background:var(--surface);color:var(--txt);font:inherit;padding:10px 12px;border-radius:24px;max-height:120px}
-#send{width:40px;height:40px;border-radius:50%;border:0;background:var(--primary);color:#fff;font-size:18px;flex:none}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+ background:linear-gradient(180deg,#d3e3fd 0%,#e8f0fe 50%,#fef7ff 100%);
+ color:#1f1f1f;display:flex;flex-direction:column;
+ padding-top:max(env(safe-area-inset-top),20px);padding-bottom:env(safe-area-inset-bottom)}
+@media (prefers-color-scheme:dark){
+body{background:linear-gradient(180deg,#0d1117 0%,#161b22 50%,#1a1625 100%);color:#e6edf3}
+.head{background:rgba(22,27,34,.8)!important;border-color:rgba(48,54,61,.5)!important}
+.btn{background:rgba(22,27,34,.6)!important;color:#e6edf3!important}
+.composer{background:rgba(22,27,34,.95)!important;border-color:rgba(48,54,61,.8)!important}
+#input{background:rgba(13,17,23,.6)!important;color:#e6edf3!important}
+.msg.user .bubble{background:linear-gradient(135deg,#1a73e8,#34a853)!important}
+.msg.ai .bubble{background:rgba(22,27,34,.9)!important;color:#e6edf3!important}
+.star{filter:drop-shadow(0 8px 24px rgba(26,115,232,.6))!important}
+}
+.head{position:fixed;top:env(safe-area-inset-top,0);left:0;right:0;height:60px;
+ background:rgba(255,255,255,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+ border-bottom:1px solid rgba(0,0,0,.06);display:flex;align-items:center;padding:0 12px;gap:8px;z-index:100}
+.btn{width:44px;height:44px;border:0;border-radius:50%;background:rgba(255,255,255,.9);
+ color:#1f1f1f;font-size:20px;display:grid;place-items:center;flex:none;
+ box-shadow:0 1px 3px rgba(0,0,0,.08);cursor:pointer}
+.title{flex:1;font-size:15px;font-weight:500;text-align:center;min-width:0}
+.pick{position:relative;display:inline-flex;align-items:center;gap:4px;padding:6px 12px;
+ background:rgba(26,115,232,.12);border-radius:20px;font-size:13px;color:#1a73e8;font-weight:500}
+.pick select{border:0;background:transparent;color:inherit;font:inherit;appearance:none;-webkit-appearance:none;padding-right:16px}
+.pick::after{content:"▾";font-size:11px;color:inherit;pointer-events:none}
+.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#4285f4,#34a853,#fbbc04,#ea4335);
+ display:grid;place-items:center;font-size:20px;color:#fff;font-weight:600}
+.main{flex:1;overflow-y:auto;overflow-x:hidden;padding:70px 16px 140px;display:flex;flex-direction:column}
+.empty{margin:auto;text-align:center;max-width:400px;width:100%;padding:20px;animation:fadeIn .5s ease}
+.star{width:120px;height:120px;margin:0 auto 24px;filter:drop-shadow(0 8px 24px rgba(26,115,232,.3));animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.empty h1{font-size:28px;font-weight:600;margin:0 0 8px;background:linear-gradient(135deg,#1a73e8,#34a853);
+ -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.empty p{font-size:15px;color:#5f6368;margin:0 0 32px;line-height:1.5}
+.suggs{display:grid;gap:10px}
+.suggs button{border:1px solid rgba(26,115,232,.2);background:#fff;color:#1f1f1f;
+ padding:14px 18px;border-radius:16px;text-align:left;font:inherit;font-size:14px;line-height:1.4;
+ box-shadow:0 1px 3px rgba(0,0,0,.06);cursor:pointer;transition:.2s}
+.suggs button:active{transform:scale(.97)}
+.chat{display:flex;flex-direction:column;gap:20px;animation:fadeIn .4s ease}
+.msg{display:flex;gap:10px;align-items:flex-start;animation:slideUp .3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.msg .av{width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;
+ background:linear-gradient(135deg,#4285f4,#34a853,#fbbc04,#ea4335);color:#fff;font-size:18px}
+.msg.user .av{background:linear-gradient(135deg,#1a73e8,#8ab4f8)}
+.bubble{max-width:78%;padding:12px 16px;border-radius:20px;font-size:15px;line-height:1.5;
+ box-shadow:0 2px 8px rgba(0,0,0,.08);overflow-wrap:anywhere}
+.msg.user .bubble{background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;border-bottom-right-radius:4px}
+.msg.ai .bubble{background:#fff;color:#1f1f1f;border-bottom-left-radius:4px}
+.bubble p{margin:0 0 8px}.bubble p:last-child{margin:0}
+.bubble code{background:rgba(0,0,0,.06);padding:2px 6px;border-radius:4px;font-size:13px;font-family:monospace}
+.bubble pre{background:rgba(0,0,0,.06);padding:12px;border-radius:10px;overflow-x:auto;margin:8px 0}
+.bubble pre code{background:none;padding:0}
+.bubble img{max-width:100%;border-radius:12px;margin-top:8px}
+.dots{display:flex;gap:4px;padding:4px 0}
+.dots span{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.4;animation:bounce 1.4s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-8px);opacity:1}}
+.composer{position:fixed;bottom:0;left:0;right:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+ background:rgba(255,255,255,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+ border-top:1px solid rgba(0,0,0,.06);z-index:100}
+.inputBox{display:flex;align-items:flex-end;gap:8px;padding:6px 8px 6px 16px;
+ background:#fff;border:1.5px solid rgba(26,115,232,.2);border-radius:28px;
+ box-shadow:0 2px 12px rgba(0,0,0,.08);transition:.2s}
+.inputBox:focus-within{border-color:#1a73e8;box-shadow:0 4px 20px rgba(26,115,232,.2)}
+.tools{display:flex;gap:2px}
+.toolBtn{width:38px;height:38px;border:0;background:transparent;color:#5f6368;font-size:20px;
+ border-radius:50%;display:grid;place-items:center;cursor:pointer;flex:none}
+.toolBtn.rec{color:#ea4335;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.94)}}
+#input{flex:1;border:0;outline:0;resize:none;background:transparent;font:inherit;font-size:15px;
+ line-height:1.5;max-height:120px;color:inherit}
+#input::placeholder{color:#9aa0a6}
+#send{width:38px;height:38px;border:0;border-radius:50%;background:linear-gradient(135deg,#1a73e8,#4285f4);
+ color:#fff;font-size:18px;display:grid;place-items:center;cursor:pointer;flex:none;transition:.2s}
 #send:disabled{opacity:.4}
-#fileList{font-size:12px;color:var(--mut);margin-top:4px;display:flex;flex-wrap:wrap;gap:4px}
-#fileList span{background:var(--surface2);padding:4px 8px;border-radius:8px}
-dialog{border:0;padding:0;background:var(--surface);color:var(--txt);width:100%;max-width:520px;margin:auto auto 0;border-radius:20px 20px 0 0;
- max-height:90vh;overflow:hidden}
-dialog::backdrop{background:rgba(0,0,0,.5)}
-.dhead{padding:20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-.dhead h3{margin:0;font-size:20px}
-.dhead button{border:0;background:transparent;font-size:24px;color:var(--mut);width:32px;height:32px;border-radius:50%}
-.dbody{padding:20px;overflow-y:auto;max-height:calc(90vh - 140px)}
-.field{display:block;margin:16px 0;font-size:14px;color:var(--txt)}
-.field label{display:block;margin-bottom:6px;font-weight:500}
-.field input,.field textarea,.field select{display:block;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font:inherit;font-size:15px}
-.field small{color:var(--mut);font-size:12px;display:block;margin-top:4px}
-.btns{display:grid;gap:8px;margin-top:20px;padding:16px 20px;border-top:1px solid var(--line)}
-.btns button{border:0;border-radius:10px;padding:12px;font:inherit;font-size:15px;background:var(--surface2);color:var(--txt)}
-.btns .primary{background:var(--primary);color:#fff;font-weight:600}
-.langs{display:flex;gap:8px;margin:16px 0}
-.langs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--surface);color:var(--txt);border-radius:10px;font:inherit}
-.langs button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+#send:active{transform:scale(.92)}
+#files{font-size:12px;color:#5f6368;margin-bottom:4px;display:flex;flex-wrap:wrap;gap:6px}
+#files span{background:rgba(26,115,232,.1);padding:4px 10px;border-radius:12px;display:inline-flex;align-items:center;gap:4px}
+dialog{border:0;padding:0;background:#fff;color:#1f1f1f;width:min(92vw,440px);border-radius:24px;
+ box-shadow:0 8px 32px rgba(0,0,0,.16);max-height:85vh;overflow:hidden}
+dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.dhead{padding:20px 20px 16px;border-bottom:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between}
+.dhead h3{font-size:20px;font-weight:600}
+.dhead button{border:0;background:transparent;font-size:24px;color:#5f6368;width:32px;height:32px;cursor:pointer}
+.dbody{padding:20px;overflow-y:auto;max-height:calc(85vh - 160px)}
+.field{margin:16px 0}
+.field label{display:block;font-size:13px;font-weight:500;color:#5f6368;margin-bottom:6px}
+.field input,.field textarea,.field select{width:100%;padding:12px 14px;border:1.5px solid rgba(0,0,0,.12);
+ border-radius:12px;background:#fff;font:inherit;font-size:15px;color:#1f1f1f;transition:.2s}
+.field input:focus,.field textarea:focus,.field select:focus{outline:0;border-color:#1a73e8;box-shadow:0 0 0 3px rgba(26,115,232,.1)}
+.field small{display:block;font-size:12px;color:#5f6368;margin-top:4px}
+.btns{padding:16px 20px;border-top:1px solid rgba(0,0,0,.08);display:grid;gap:10px}
+.btns button{border:0;padding:13px;border-radius:12px;font:inherit;font-size:15px;font-weight:500;cursor:pointer}
+.btns .primary{background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff}
+.btns .secondary{background:rgba(26,115,232,.08);color:#1a73e8}
+.langs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:16px 0}
+.langs button{padding:12px;border:1.5px solid rgba(0,0,0,.12);background:#fff;color:#1f1f1f;
+ border-radius:12px;font:inherit;font-size:14px;cursor:pointer;transition:.2s}
+.langs button.active{background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;border-color:transparent}
 </style>
 </head>
 <body>
-<header>
-  <div class="logo">🤖</div>
-  <div class="titles">
-    <b id="appName">Mano AI</b>
-    <label class="pick"><select id="model" aria-label="Modelis"></select></label>
+<div class="head">
+  <button class="btn" id="menuBtn">☰</button>
+  <div class="title">
+    <label class="pick"><select id="model"></select></label>
   </div>
-  <button class="icon" id="langBtn" aria-label="Kalba">🌐</button>
-  <button class="icon" id="setBtn" aria-label="Nustatymai">⚙️</button>
-</header>
+  <button class="btn" id="newBtn">✎</button>
+  <button class="btn" id="setBtn">⚙</button>
+</div>
 
-<main id="chat"></main>
+<div class="main" id="main">
+  <div class="empty" id="empty">
+    <svg class="star" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#4285f4"/>
+          <stop offset="33%" style="stop-color:#34a853"/>
+          <stop offset="66%" style="stop-color:#fbbc04"/>
+          <stop offset="100%" style="stop-color:#ea4335"/>
+        </linearGradient>
+      </defs>
+      <path fill="url(#g1)" d="M60,15 L70,50 L105,50 L77,70 L87,105 L60,85 L33,105 L43,70 L15,50 L50,50 Z"/>
+    </svg>
+    <h1 id="emptyTitle">Labas! 👋</h1>
+    <p id="emptyDesc">Ką šiandien galiu padėti?</p>
+    <div class="suggs" id="suggs"></div>
+  </div>
+</div>
 
-<footer>
-  <div class="composer">
+<div class="composer">
+  <div id="files"></div>
+  <div class="inputBox">
     <div class="tools">
-      <button id="micBtn" aria-label="Mikrofonas">🎤</button>
-      <label style="width:40px;height:40px;display:grid;place-items:center;cursor:pointer">
+      <label class="toolBtn">
         <input type="file" id="fileBtn" multiple accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt" style="display:none">
-        <span style="font-size:20px;color:var(--mut)">📎</span>
+        📎
       </label>
+      <button class="toolBtn" id="micBtn">🎙</button>
     </div>
-    <div id="inputWrap">
-      <textarea id="input" rows="1" placeholder="Rašykite žinutę…"></textarea>
-      <div id="fileList"></div>
-    </div>
-    <button id="send" aria-label="Siųsti">➤</button>
+    <textarea id="input" rows="1" placeholder="Klauskite..."></textarea>
+    <button id="send">➤</button>
   </div>
-</footer>
+</div>
 
 <dialog id="langDialog">
   <div class="dhead"><h3 id="langTitle">Kalba</h3><button onclick="langDialog.close()">✕</button></div>
   <div class="dbody">
     <div class="langs">
-      <button data-lang="lt">🇱🇹 Lietuvių</button>
-      <button data-lang="en">🇬🇧 English</button>
-      <button data-lang="ru">🇷🇺 Русский</button>
+      <button data-lang="lt">🇱🇹 LT</button>
+      <button data-lang="en">🇬🇧 EN</button>
+      <button data-lang="ru">🇷🇺 RU</button>
     </div>
   </div>
 </dialog>
@@ -127,266 +179,62 @@ dialog::backdrop{background:rgba(0,0,0,.5)}
         <option value="https://anymodel.org/v1/messages">Claude messages</option>
         <option value="https://anymodel.org/v1/responses">Responses</option>
       </select>
-      <small id="sm1">Pasirinkite pagal jūsų AI modelį</small>
     </div>
     <div class="field">
       <label id="lbl2">API raktas</label>
-      <input id="apiKey" type="password" autocomplete="off">
-      <small id="sm2">Užšifruojamas 256-bit AES</small>
+      <input id="apiKey" type="password">
+      <small id="sm2">Užšifruojamas AES-256</small>
     </div>
     <div class="field">
-      <label id="lbl3">Slaptažodis raktui</label>
-      <input id="passphrase" type="password" autocomplete="new-password">
-      <small id="sm3">Žinote tik jūs, be jo raktas neveiks</small>
+      <label id="lbl3">Slaptažodis</label>
+      <input id="pass" type="password">
+      <small id="sm3">Tik jūs žinote</small>
     </div>
     <div class="field">
-      <label id="lbl4">Modeliai (po vieną eilutėje)</label>
-      <textarea id="models" rows="4"></textarea>
+      <label id="lbl4">Modeliai</label>
+      <textarea id="models" rows="3"></textarea>
     </div>
   </div>
   <div class="btns">
     <button id="save" class="primary">Išsaugoti</button>
-    <button id="fetchModels">Gauti modelius</button>
-    <button id="clear">Išvalyti pokalbį</button>
+    <button id="fetch" class="secondary">Gauti modelius</button>
+    <button id="clear" class="secondary">Naujas pokalbis</button>
   </div>
 </dialog>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <script>
-const $ = id => document.getElementById(id);
-const S = {
-  get: k => { try { return localStorage.getItem(k); } catch { return null; } },
-  set: (k, v) => { try { localStorage.setItem(k, v); } catch {} }
-};
-const DEFAULT_MODELS = "claude-opus-5-5\nclaude-sonnet-5-5\ngpt-4o\ngpt-4o-mini\ngemini-2.0-flash-exp\ngemini-exp-1206";
-const T = {
-  lt: { appName: 'Mano AI', placeholder: 'Rašykite žinutę…', sugg: ['Padėk sugalvoti nuotraukos aprašymą', 'Geriausios fotografavimo vietos Lietuvoje?', 'Paaiškink, kas yra diafragma'], emptyTitle: 'Labas! 👋', emptyDesc: 'Ką šiandien veiksime?', setTitle: 'Nustatymai', langTitle: 'Kalba', lbl1: 'API adresas', lbl2: 'API raktas', lbl3: 'Slaptažodis raktui', lbl4: 'Modeliai (po vieną eilutėje)', sm1: 'Pasirinkite pagal jūsų AI modelį', sm2: 'Užšifruojamas 256-bit AES', sm3: 'Žinote tik jūs, be jo raktas neveiks', save: 'Išsaugoti', fetchModels: 'Gauti modelius', clear: 'Išvalyti pokalbį', err: 'Klaida', listening: 'Klausomasi…' },
-  en: { appName: 'My AI', placeholder: 'Type a message…', sugg: ['Help me write a photo caption', 'Best photo spots in Lithuania?', 'Explain aperture simply'], emptyTitle: 'Hello! 👋', emptyDesc: 'What shall we do today?', setTitle: 'Settings', langTitle: 'Language', lbl1: 'API endpoint', lbl2: 'API key', lbl3: 'Passphrase for key', lbl4: 'Models (one per line)', sm1: 'Choose based on your AI model', sm2: 'Encrypted with 256-bit AES', sm3: 'Only you know it, key won't work without it', save: 'Save', fetchModels: 'Fetch models', clear: 'Clear chat', err: 'Error', listening: 'Listening…' },
-  ru: { appName: 'Мой AI', placeholder: 'Напишите сообщение…', sugg: ['Помоги написать подпись к фото', 'Лучшие места для фото в Литве?', 'Объясни, что такое диафрагма'], emptyTitle: 'Привет! 👋', emptyDesc: 'Что будем делать сегодня?', setTitle: 'Настройки', langTitle: 'Язык', lbl1: 'API адрес', lbl2: 'API ключ', lbl3: 'Пароль для ключа', lbl4: 'Модели (по одной на строку)', sm1: 'Выберите по вашей AI модели', sm2: 'Шифруется 256-bit AES', sm3: 'Знаете только вы, без него ключ не работает', save: 'Сохранить', fetchModels: 'Получить модели', clear: 'Очистить чат', err: 'Ошибка', listening: 'Слушаю…' }
-};
-let lang = S.get('lang') || 'lt';
-let history = [];
-try { history = JSON.parse(S.get('history') || '[]'); } catch { history = []; }
-let files = [];
-let recognition;
-
-function t(key) { return T[lang][key] || key; }
-function updateLang() {
-  document.documentElement.lang = lang;
-  $('appName').textContent = t('appName');
-  $('input').placeholder = t('placeholder');
-  $('setTitle').textContent = t('setTitle');
-  $('langTitle').textContent = t('langTitle');
-  $('lbl1').textContent = t('lbl1');
-  $('lbl2').textContent = t('lbl2');
-  $('lbl3').textContent = t('lbl3');
-  $('lbl4').textContent = t('lbl4');
-  $('sm1').textContent = t('sm1');
-  $('sm2').textContent = t('sm2');
-  $('sm3').textContent = t('sm3');
-  $('save').textContent = t('save');
-  $('fetchModels').textContent = t('fetchModels');
-  $('clear').textContent = t('clear');
-  document.querySelectorAll('.langs button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
-  render();
-}
-function encryptKey(key, pass) {
-  return CryptoJS.AES.encrypt(key, pass).toString();
-}
-function decryptKey(enc, pass) {
-  try { return CryptoJS.AES.decrypt(enc, pass).toString(CryptoJS.enc.Utf8); } catch { return ''; }
-}
-function md(txt) {
-  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  return String(txt).split('```').map((p, i) => {
-    if (i % 2) return '<pre><code>' + esc(p.replace(/^[^\n]*\n/, '')) + '</code></pre>';
-    return esc(p).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
-      .split(/\n{2,}/).map(x => x.trim() ? '<p>' + x.trim().replace(/\n/g, '<br>') + '</p>' : '').join('');
-  }).join('');
-}
-function fillModels() {
-  const list = (S.get('models') || DEFAULT_MODELS).split('\n').map(s => s.trim()).filter(Boolean);
-  $('model').innerHTML = '';
-  list.forEach(m => { const o = document.createElement('option'); o.textContent = m; $('model').appendChild(o); });
-  const last = S.get('lastModel');
-  if (last && list.includes(last)) $('model').value = last;
-}
-function openSettings() {
-  $('endpoint').value = S.get('endpoint') || 'https://anymodel.org/v1/chat/completions';
-  $('apiKey').value = '';
-  $('passphrase').value = '';
-  $('models').value = S.get('models') || DEFAULT_MODELS;
-  $('settings').showModal();
-}
-function add(role, content, isImage) {
-  $('empty')?.remove();
-  const row = document.createElement('div');
-  row.className = 'row ' + role;
-  const b = document.createElement('div');
-  b.className = 'bubble';
-  if (role === 'assistant') {
-    const av = document.createElement('div');
-    av.className = 'av';
-    av.textContent = '🤖';
-    row.appendChild(av);
-  }
-  if (isImage) b.innerHTML = '<img src="' + content + '" alt="Generated">';
-  else if (role === 'user') b.textContent = content;
-  else b.innerHTML = md(content);
-  row.appendChild(b);
-  $('chat').appendChild(row);
-  $('chat').scrollTop = $('chat').scrollHeight;
-  return b;
-}
-function render() {
-  $('chat').innerHTML = '';
-  if (!history.length) {
-    const e = document.createElement('div');
-    e.id = 'empty';
-    e.innerHTML = '<div class="logo">🤖</div><h2>' + t('emptyTitle') + '</h2><p>' + t('emptyDesc') + '</p><div class="sugg"></div>';
-    t('sugg').forEach(s => {
-      const btn = document.createElement('button');
-      btn.textContent = s;
-      btn.onclick = () => { $('input').value = s; send(); };
-      e.querySelector('.sugg').appendChild(btn);
-    });
-    $('chat').appendChild(e);
-  } else history.forEach(m => {
-    if (m.image) add(m.role, m.content, true);
-    else add(m.role, m.content);
-  });
-}
-function grow() {
-  const inp = $('input');
-  inp.style.height = 'auto';
-  inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
-}
-async function toBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(',')[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-async function send() {
-  const text = $('input').value.trim();
-  if (!text && !files.length) return;
-  const enc = S.get('apiKey');
-  const pass = S.get('passphrase');
-  if (!enc || !pass) { openSettings(); return; }
-  const key = decryptKey(enc, pass);
-  if (!key) { alert(t('err') + ': ' + (lang === 'ru' ? 'неверный пароль' : lang === 'en' ? 'wrong passphrase' : 'neteisingas slaptažodis')); return; }
-  $('input').value = '';
-  $('fileList').innerHTML = '';
-  grow();
-  const msg = { role: 'user', content: text };
-  if (files.length) {
-    msg.files = await Promise.all(files.map(async f => ({ name: f.name, data: await toBase64(f) })));
-  }
-  history.push(msg);
-  add('user', text + (files.length ? ' 📎×' + files.length : ''));
-  files = [];
-  const el = add('assistant', '');
-  el.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
-  $('send').disabled = true;
-  try {
-    const endpoint = S.get('endpoint') || 'https://anymodel.org/v1/chat/completions';
-    const body = { model: $('model').value, messages: history.map(m => ({ role: m.role, content: m.content })) };
-    const r = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-      body: JSON.stringify(body)
-    });
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(d.error?.message || ('HTTP ' + r.status));
-    const ans = d.choices?.[0]?.message?.content || d.content?.[0]?.text || d.response || '(empty)';
-    if (d.image_url) {
-      history.push({ role: 'assistant', content: d.image_url, image: true });
-      el.innerHTML = '<img src="' + d.image_url + '" alt="Generated">';
-    } else {
-      history.push({ role: 'assistant', content: ans });
-      el.innerHTML = md(ans);
-    }
-    S.set('history', JSON.stringify(history));
-  } catch (e) {
-    history.pop();
-    el.textContent = t('err') + ': ' + e.message;
-    el.parentElement.classList.add('err');
-  }
-  $('send').disabled = false;
-  $('chat').scrollTop = $('chat').scrollHeight;
-}
-
-$('send').onclick = send;
-$('input').addEventListener('input', grow);
-$('input').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey && window.innerWidth > 600) { e.preventDefault(); send(); }
-});
-$('setBtn').onclick = openSettings;
-$('langBtn').onclick = () => $('langDialog').showModal();
-$('model').onchange = () => S.set('lastModel', $('model').value);
-$('save').onclick = () => {
-  const key = $('apiKey').value.trim();
-  const pass = $('passphrase').value.trim();
-  if (key && pass) S.set('apiKey', encryptKey(key, pass));
-  if (pass) S.set('passphrase', pass);
-  S.set('endpoint', $('endpoint').value);
-  S.set('models', $('models').value.trim());
-  fillModels();
-  $('settings').close();
-};
-$('fetchModels').onclick = async () => {
-  try {
-    const enc = S.get('apiKey');
-    const pass = $('passphrase').value.trim() || S.get('passphrase');
-    if (!enc || !pass) { alert(t('err')); return; }
-    const key = decryptKey(enc, pass);
-    const r = await fetch('https://anymodel.org/v1/models', { headers: { 'Authorization': 'Bearer ' + key } });
-    const d = await r.json();
-    $('models').value = (d.data || []).map(m => m.id).join('\n');
-  } catch (e) { alert(t('err') + ': ' + e.message); }
-};
-$('clear').onclick = () => {
-  history = [];
-  S.set('history', '[]');
-  render();
-  $('settings').close();
-};
-document.querySelectorAll('.langs button').forEach(b => {
-  b.onclick = () => { lang = b.dataset.lang; S.set('lang', lang); updateLang(); $('langDialog').close(); };
-});
-$('fileBtn').onchange = e => {
-  files = Array.from(e.target.files);
-  $('fileList').innerHTML = files.map(f => '<span>' + f.name + '</span>').join('');
-};
-$('micBtn').onclick = () => {
-  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-    alert(lang === 'ru' ? 'Микрофон не поддерживается' : lang === 'en' ? 'Microphone not supported' : 'Mikrofonas nepalaikomas');
-    return;
-  }
-  if (!recognition) {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SR();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.onresult = e => {
-      $('input').value = e.results[0][0].transcript;
-      grow();
-      $('micBtn').classList.remove('recording');
-    };
-    recognition.onerror = () => $('micBtn').classList.remove('recording');
-    recognition.onend = () => $('micBtn').classList.remove('recording');
-  }
-  const codes = { lt: 'lt-LT', en: 'en-US', ru: 'ru-RU' };
-  recognition.lang = codes[lang] || 'lt-LT';
-  recognition.start();
-  $('micBtn').classList.add('recording');
-};
-
-fillModels();
-updateLang();
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+const $=id=>document.getElementById(id),S={get:k=>{try{return localStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}};
+const D='claude-opus-5-5\nclaude-sonnet-5-5\ngpt-4o\ngemini-2.0-flash-exp';
+const T={lt:{placeholder:'Klauskite...',sugg:['Padėk sugalvoti Instagram aprašymą','Fotografavimo vietos Lietuvoje?','Kas yra diafragma?'],emptyTitle:'Labas! 👋',emptyDesc:'Ką šiandien galiu padėti?',setTitle:'Nustatymai',langTitle:'Kalba',lbl1:'API adresas',lbl2:'API raktas',lbl3:'Slaptažodis',lbl4:'Modeliai',sm2:'Užšifruojamas AES-256',sm3:'Tik jūs žinote',save:'Išsaugoti',fetch:'Gauti modelius',clear:'Naujas pokalbis',err:'Klaida'},en:{placeholder:'Ask me...',sugg:['Help write Instagram caption','Photo spots in Lithuania?','What is aperture?'],emptyTitle:'Hello! 👋',emptyDesc:'How can I help today?',setTitle:'Settings',langTitle:'Language',lbl1:'API endpoint',lbl2:'API key',lbl3:'Passphrase',lbl4:'Models',sm2:'Encrypted AES-256',sm3:'Only you know',save:'Save',fetch:'Fetch models',clear:'New chat',err:'Error'},ru:{placeholder:'Спросите...',sugg:['Помоги написать подпись','Места для фото в Литве?','Что такое диафрагма?'],emptyTitle:'Привет! 👋',emptyDesc:'Чем могу помочь?',setTitle:'Настройки',langTitle:'Язык',lbl1:'API адрес',lbl2:'API ключ',lbl3:'Пароль',lbl4:'Модели',sm2:'Шифруется AES-256',sm3:'Только вы знаете',save:'Сохранить',fetch:'Получить модели',clear:'Новый чат',err:'Ошибка'}};
+let lang=S.get('lang')||'lt',hist=[],files=[],rec;
+try{hist=JSON.parse(S.get('hist')||'[]')}catch{}
+function t(k){return T[lang][k]||k}
+function enc(s,p){return CryptoJS.AES.encrypt(s,p).toString()}
+function dec(s,p){try{return CryptoJS.AES.decrypt(s,p).toString(CryptoJS.enc.Utf8)}catch{return''}}
+function md(s){const e=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return String(s).split('```').map((p,i)=>i%2?'<pre><code>'+e(p.replace(/^[^\n]*\n/,''))+'</code></pre>':e(p).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').split(/\n{2,}/).map(x=>x.trim()?'<p>'+x.trim().replace(/\n/g,'<br>')+'</p>':'').join('')).join('')}
+function up(){document.documentElement.lang=lang;$('input').placeholder=t('placeholder');$('emptyTitle').textContent=t('emptyTitle');$('emptyDesc').textContent=t('emptyDesc');$('setTitle').textContent=t('setTitle');$('langTitle').textContent=t('langTitle');$('lbl1').textContent=t('lbl1');$('lbl2').textContent=t('lbl2');$('lbl3').textContent=t('lbl3');$('lbl4').textContent=t('lbl4');$('sm2').textContent=t('sm2');$('sm3').textContent=t('sm3');$('save').textContent=t('save');$('fetch').textContent=t('fetch');$('clear').textContent=t('clear');document.querySelectorAll('.langs button').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));render()}
+function fill(){const l=(S.get('models')||D).split('\n').map(s=>s.trim()).filter(Boolean);$('model').innerHTML='';l.forEach(m=>{const o=document.createElement('option');o.textContent=m;$('model').appendChild(o)});const last=S.get('last');if(last&&l.includes(last))$('model').value=last}
+function add(role,txt,img){$('empty')?.remove();const d=document.createElement('div');d.className='msg '+role;if(role==='ai'){const a=document.createElement('div');a.className='av';a.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12,2 L15,9 L22,9 L16,14 L19,22 L12,17 L5,22 L8,14 L2,9 L9,9 Z" fill="white"/></svg>';d.appendChild(a)}const b=document.createElement('div');b.className='bubble';if(img)b.innerHTML='<img src="'+txt+'">';else if(role==='user')b.textContent=txt;else b.innerHTML=md(txt);d.appendChild(b);if(!$('main').querySelector('.chat')){const c=document.createElement('div');c.className='chat';$('main').appendChild(c)}$('main').querySelector('.chat').appendChild(d);$('main').scrollTop=$('main').scrollHeight;return b}
+function render(){$('main').innerHTML='';if(!hist.length){const e=document.createElement('div');e.className='empty';e.id='empty';e.innerHTML='<svg class="star" viewBox="0 0 120 120"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4285f4"/><stop offset="33%" stop-color="#34a853"/><stop offset="66%" stop-color="#fbbc04"/><stop offset="100%" stop-color="#ea4335"/></linearGradient></defs><path fill="url(#g1)" d="M60,15 L70,50 L105,50 L77,70 L87,105 L60,85 L33,105 L43,70 L15,50 L50,50 Z"/></svg><h1>'+t('emptyTitle')+'</h1><p>'+t('emptyDesc')+'</p><div class="suggs"></div>';t('sugg').forEach(s=>{const btn=document.createElement('button');btn.textContent=s;btn.onclick=()=>{$('input').value=s;send()};e.querySelector('.suggs').appendChild(btn)});$('main').appendChild(e)}else{const c=document.createElement('div');c.className='chat';$('main').appendChild(c);hist.forEach(m=>add(m.role,m.content,m.img))}}
+function grow(){const i=$('input');i.style.height='auto';i.style.height=Math.min(i.scrollHeight,120)+'px'}
+async function b64(f){return new Promise(r=>{const rd=new FileReader();rd.onload=()=>r(rd.result.split(',')[1]);rd.readAsDataURL(f)})}
+async function send(){const txt=$('input').value.trim();if(!txt&&!files.length)return;const e=S.get('key'),p=S.get('pass');if(!e||!p){$('settings').showModal();return}const k=dec(e,p);if(!k){alert(t('err')+': '+(lang==='ru'?'неверный пароль':lang==='en'?'wrong passphrase':'neteisingas slaptažodis'));return}$('input').value='';$('files').innerHTML='';grow();const msg={role:'user',content:txt};if(files.length)msg.files=await Promise.all(files.map(async f=>({name:f.name,data:await b64(f)})));hist.push(msg);add('user',txt+(files.length?' 📎×'+files.length:''));files=[];const el=add('ai','');el.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';$('send').disabled=true;try{const ep=S.get('ep')||'https://anymodel.org/v1/chat/completions';const body={model:$('model').value,messages:hist.map(m=>({role:m.role,content:m.content}))};const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error?.message||('HTTP '+r.status));const ans=d.choices?.[0]?.message?.content||d.content?.[0]?.text||d.response||'(empty)';if(d.image_url){hist.push({role:'ai',content:d.image_url,img:true});el.innerHTML='<img src="'+d.image_url+'">';  }else{hist.push({role:'ai',content:ans});el.innerHTML=md(ans)}S.set('hist',JSON.stringify(hist))}catch(e){hist.pop();el.textContent=t('err')+': '+e.message;el.parentElement.classList.add('err')}$('send').disabled=false;$('main').scrollTop=$('main').scrollHeight}
+$('send').onclick=send;
+$('input').oninput=grow;
+$('input').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&window.innerWidth>600){e.preventDefault();send()}};
+$('setBtn').onclick=()=>{$('endpoint').value=S.get('ep')||'https://anymodel.org/v1/chat/completions';$('apiKey').value='';$('pass').value='';$('models').value=S.get('models')||D;$('settings').showModal()};
+$('menuBtn').onclick=()=>$('langDialog').showModal();
+$('newBtn').onclick=()=>{hist=[];S.set('hist','[]');render()};
+$('model').onchange=()=>S.set('last',$('model').value);
+$('save').onclick=()=>{const k=$('apiKey').value.trim(),p=$('pass').value.trim();if(k&&p)S.set('key',enc(k,p));if(p)S.set('pass',p);S.set('ep',$('endpoint').value);S.set('models',$('models').value.trim());fill();$('settings').close()};
+$('fetch').onclick=async()=>{try{const e=S.get('key'),p=$('pass').value.trim()||S.get('pass');if(!e||!p){alert(t('err'));return}const k=dec(e,p);const r=await fetch('https://anymodel.org/v1/models',{headers:{'Authorization':'Bearer '+k}});const d=await r.json();$('models').value=(d.data||[]).map(m=>m.id).join('\n')}catch(e){alert(t('err')+': '+e.message)}};
+$('clear').onclick=()=>{hist=[];S.set('hist','[]');render();$('settings').close()};
+document.querySelectorAll('.langs button').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;S.set('lang',lang);up();$('langDialog').close()});
+$('fileBtn').onchange=e=>{files=Array.from(e.target.files);$('files').innerHTML=files.map(f=>'<span>📎 '+f.name+'</span>').join('')};
+$('micBtn').onclick=()=>{if(!('webkitSpeechRecognition'in window||'SpeechRecognition'in window)){alert(lang==='ru'?'Микрофон не поддерживается':lang==='en'?'Mic not supported':'Mikrofonas nepalaikomas');return}if(!rec){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;rec=new SR();rec.continuous=false;rec.interimResults=false;rec.onresult=e=>{$('input').value=e.results[0][0].transcript;grow();$('micBtn').classList.remove('rec')};rec.onerror=()=>$('micBtn').classList.remove('rec');rec.onend=()=>$('micBtn').classList.remove('rec')}const c={lt:'lt-LT',en:'en-US',ru:'ru-RU'};rec.lang=c[lang]||'lt-LT';rec.start();$('micBtn').classList.add('rec')};
+fill();up();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
 </script>
 </body>
 </html>
