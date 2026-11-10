@@ -39,7 +39,7 @@ const fmtD=t=>new Date(t).toLocaleString('lt-LT',{dateStyle:'short',timeStyle:'s
 const dayStr=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 let toastT;function toast(s){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3000)}
 
-/* ===== Nustatymai (saugomi telefone, išlieka uždarius) ===== */
+/* ===== Nustatymai ===== */
 const EPS=[{id:'chat',name:'Chat (numatytasis)',url:'https://anymodel.org/v1/chat/completions'},{id:'resp',name:'Responses',url:'https://anymodel.org/v1/responses'},{id:'claude',name:'Claude messages',url:'https://anymodel.org/v1/messages'}];
 const COLORS=['#0866ff','#0a7cff','#00a884','#7c3aed','#e5484d','#f59e0b','#111111'];
 const DEF={theme:'auto',accent:'#0866ff',fs:16,model:'',imgModel:'nano-banana',models:['claude-opus-5-5','claude-sonnet-5-5','nano-banana'],
@@ -52,7 +52,7 @@ if(!Array.isArray(cfg.eps)||!cfg.eps.length)cfg.eps=JSON.parse(JSON.stringify(EP
 if(!cfg.model)cfg.model=cfg.models[0]||'';
 const saveCfg=()=>{try{localStorage.setItem('mai_cfg',JSON.stringify(cfg))}catch{}};
 
-/* ===== Šifruota saugykla (IndexedDB + AES-256-GCM) ===== */
+/* ===== Šifruota saugykla ===== */
 const dbP=new Promise((res,rej)=>{const r=indexedDB.open('manoai',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
 async function idb(mode,fn){const d=await dbP;return new Promise((res,rej)=>{const t=d.transaction('kv',mode),r=fn(t.objectStore('kv'));t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error)})}
 const iget=k=>idb('readonly',s=>s.get(k)),iset=(k,v)=>idb('readwrite',s=>s.put(v,k)),iclear=()=>idb('readwrite',s=>s.clear());
@@ -173,7 +173,7 @@ async function fetchModels(){if(!V.key)return toast('Pirma įveskite API raktą'
   cfg.models=[...new Set(l)];if(!cfg.models.includes(cfg.model))cfg.model=cfg.models[0];saveCfg();upModel();toast('Rasta modelių: '+cfg.models.length)}
  catch(e){toast('Nepavyko gauti modelių: '+e.message)}}
 
-/* ===== Mikrofonas (diktavimas) ===== */
+/* ===== Mikrofonas ===== */
 let rec=null,recOn=false;
 function dictate(){const S=SRc();if(!S)return toast('Šis telefonas nepalaiko balso atpažinimo');if(recOn){rec.stop();return}
  rec=new S();rec.lang=cfg.voiceLang;rec.interimResults=true;rec.continuous=false;const base=inputEl.value?inputEl.value.trimEnd()+' ':'';
@@ -205,7 +205,7 @@ async function camToggle(){if(LV.cam){LV.cam.getTracks().forEach(t=>t.stop());LV
  catch{toast('Nepavyko įjungti kameros. Leiskite ją naudoti.')}}
 function liveStop(){LV.on=false;try{LV.rec&&LV.rec.abort()}catch{}if('speechSynthesis' in window)speechSynthesis.cancel();if(LV.cam)camToggle();liveEl.hidden=true;if(ctrl)ctrl.abort()}
 
-/* ===== Šoninis meniu, apatiniai langai, puslapiai ===== */
+/* ===== Meniu, langai, puslapiai ===== */
 const pushO=()=>{if(!history.state?.o)history.pushState({o:1},'')};
 const syncScrim=()=>{scrimEl.hidden=!(drawerEl.classList.contains('open')||!sheetEl.hidden)};
 function openDrawer(){renderDrawer();drawerEl.classList.add('open');syncScrim();pushO()}
@@ -228,7 +228,7 @@ function renderList(){const q=dq.trim().toLowerCase();
  }).sort((a,b)=>b.updated-a.updated);
  $('dList').innerHTML=L.map(c=>{const pn=c.projectId&&V.projects.find(p=>p.id===c.projectId);
   return `<div class="item${cur&&cur.id===c.id?' cur':''}" data-act="open" data-id="${c.id}"><span class="t"><span class="tt">${esc(c.title)}</span><small>${fmtD(c.updated)}${pn?' · '+esc(pn.title):''}</small></span><button class="ib" data-act="more" data-id="${c.id}" aria-label="Daugiau">${ic('more')}</button></div>`}).join('')||'<p class="mu" style="padding:12px">Pokalbių nerasta</p>'}
-const DH={nav:id=>{closeDrawer();({newChat:()=>newChat(),projects:()=>colPage('projects'),library:libraryPage,facts:()=>colPage('facts'),links:()=>colPage('links'),reminders:()=>colPage('reminders'),skills:()=>colPage('skills'),settings:settingsPage,lock:lockNow})[id]()},
+const DH={nav:id=>{closeDrawer();({newChat:()=>newChat(),projects:()=>colPage('projects'),library:()=>libraryPage(),facts:()=>colPage('facts'),links:()=>colPage('links'),reminders:()=>colPage('reminders'),skills:()=>colPage('skills'),settings:()=>settingsPage(),lock:()=>lockNow()})[id]()},
  open:id=>openChat(id),more:id=>chatMore(id),flt:k=>{flt[k]=!flt[k];renderDrawer()},
  input:t=>{if(t.id==='dq'){dq=t.value;renderList()}if(t.id==='fdate'){fdate=t.value;renderList()}}};
 function chatMore(id){const c=V.chats.find(x=>x.id===id);if(!c)return;
@@ -266,6 +266,4 @@ function colPage(name,editId){const C=COLS[name],L=V[name],ed=editId?L.find(x=>x
  del:id=>{if(!confirm('Ištrinti šį įrašą?'))return;V[name]=V[name].filter(x=>x.id!==id);if(name==='projects')V.chats.forEach(c=>{if(c.projectId===id)c.projectId=null});save();colPage(name)},
  imp:()=>{impTarget=name;$('fImport').accept=C.imp;$('fImport').click()},openProj:id=>projPage(id),
  ch:t=>{if(t.dataset.ch==='item'){const x=V[name].find(y=>y.id===t.dataset.id);if(x){x.on=t.checked;save()}}}})}
-function projPage(id){const p=V.projects.find(x=>x.id===id);if(!p)return colPage('projects');const ch=V.chats.filter(c=>c.projectId===id);
- openPage('proj',p.title,`<div class="card"><div class="row col"><b>Instrukcijos</b><small>${esc(p.text||'Nėra')}</small></div></div><button class="btn p w" data-act="newIn">${ic('newc')}Naujas pokalbis projekte</button>
-<div class="card" style="margin-top:14px"><h4>Pokalbiai (${ch.length})</h4>${ch.map(c=>`<div class="item" data-act="open" data-id="${c.id}"><span class="t"><span class="tt">${esc(c.title)}</span><small>${fmtD(c.
+/* ===== app.js pabaiga ===== */
