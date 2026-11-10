@@ -178,13 +178,16 @@ $('lockPass').addEventListener('keydown',e=>{if(e.key==='Enter')doUnlock()});
 (async()=>{
  ['key','pass','hist','apiKey','passphrase','history','models','ep','endpoint','last','lastModel','lang','baseUrl'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
  applyLook();setIcons();applyToggles();upModel();upGo();
- const fb=document.createElement('button');fb.id='lockForgot';fb.className='btn';fb.style.cssText='background:none;color:var(--mu)';fb.textContent='Pamiršau slaptažodį';
- fb.onclick=async()=>{if(confirm('Bus ištrinta VISKAS: raktas, pokalbiai, faktai. Tęsti?')){await iclear();hasVault=false;location.reload()}};
- $('lockErr').after(fb);
- try{const v=await iget('vault');hasVault=!!v;if(v&&!v.salt){KEY=await devKey();V={...blank(),...JSON.parse(td.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:v.iv},KEY,v.ct)))};SALT=null;afterUnlock();return}}catch{}
- if(hasVault)showLock();
- else{KEY=await devKey();SALT=null;V=blank();await saveNow();afterUnlock()}
  try{navigator.storage?.persist?.()}catch{}
- if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+ if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+ const fb=document.createElement('button');fb.id='lockForgot';fb.className='btn';fb.style.cssText='background:none;color:var(--mu)';fb.textContent='Pamiršau slaptažodį';
+ fb.onclick=async()=>{if(confirm('Bus ištrinta VISKAS: raktas, pokalbiai, faktai. Tęsti?')){await iclear();location.reload()}};
+ $('lockErr').after(fb);
+ let v=null;try{v=await iget('vault')}catch{}
+ if(v&&v.salt){hasVault=true;showLock();return}
+ try{KEY=await devKey();SALT=null;
+  V=v?{...blank(),...JSON.parse(td.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:v.iv},KEY,v.ct)))}:blank();
+  if(!v)await saveNow();afterUnlock()}
+ catch{hasVault=true;showLock();$('lockErr').textContent='Nepavyko atidaryti duomenų. Spauskite „Pamiršau slaptažodį“, kad pradėtumėte iš naujo.'}
 })();
 /* ===== app2.js pabaiga ===== */
