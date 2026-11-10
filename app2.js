@@ -65,12 +65,18 @@ ${cfg.eps.map(x=>`<div class="item${x.id===cfg.ep?' sel':''}" data-act="ep" data
 
 <div class="card"><h4>Funkcijos</h4>${F.map(([k,n])=>`<div class="row"><div class="t">${n}</div>${sw(k)}</div>`).join('')}</div>
 
-<div class="card"><h4>Saugumas ir duomenys</h4><div class="row col">
-<small>Pakeisti slaptažodį</small>
+<div class="card"><h4>Slaptažodis</h4>${SALT?`<div class="row"><div class="t">Įjungtas<small>Programėlė atrakinama slaptažodžiu</small></div><button class="btn" data-act="disPass">Išjungti</button></div>
+<div class="row col"><small>Pakeisti į naują slaptažodį</small>
 <input class="in" id="s_p1" type="password" autocomplete="new-password" placeholder="Naujas slaptažodis">
 <input class="in" id="s_p2" type="password" autocomplete="new-password" placeholder="Pakartokite">
-<button class="btn" data-act="pass">Pakeisti slaptažodį</button></div>
-<div class="row col"><button class="btn d" data-act="clearHist">${ic('trash')}Ištrinti visus pokalbius</button><button class="btn d" data-act="wipe">${ic('trash')}Ištrinti visus duomenis</button></div></div>`,{
+<button class="btn" data-act="pass">Pakeisti slaptažodį</button></div>`
+:`<div class="row"><div class="t">Išjungtas<small>Programėlė atsidaro iškart</small></div></div>
+<div class="row col"><small>Įjungti slaptažodį (bent 8 simboliai)</small>
+<input class="in" id="s_p1" type="password" autocomplete="new-password" placeholder="Slaptažodis">
+<input class="in" id="s_p2" type="password" autocomplete="new-password" placeholder="Pakartokite">
+<button class="btn p" data-act="enPass">Įjungti slaptažodį</button></div>`}</div>
+
+<div class="card"><h4>Duomenys</h4><div class="row col"><button class="btn d" data-act="clearHist">${ic('trash')}Ištrinti visus pokalbius</button><button class="btn d" data-act="wipe">${ic('trash')}Ištrinti visus duomenis</button></div></div>`,{
  saveKey:()=>{const v=$('s_key').value.trim();if(v.length<8)return toast('Raktas per trumpas');V.key=v;save();toast('Raktas užšifruotas ir išsaugotas');settingsPage()},
  delKey:()=>{if(confirm('Ištrinti API raktą?')){V.key='';save();settingsPage()}},
  ep:id=>{cfg.ep=id;saveCfg();settingsPage()},
@@ -91,8 +97,11 @@ ${cfg.eps.map(x=>`<div class="item${x.id===cfg.ep?' sel':''}" data-act="ep" data
  color:c=>{cfg.accent=c;saveCfg();applyLook();settingsPage()},
  vlang:k=>{cfg.voiceLang=k;cfg.voice='';saveCfg();settingsPage()},
  test:()=>speak({'lt-LT':'Labas! Taip skamba mano balsas.','en-US':'Hello! This is how my voice sounds.','ru-RU':'Привет! Так звучит мой голос.'}[cfg.voiceLang]),
+ enPass:async()=>{const a=$('s_p1').value,b=$('s_p2').value;if(a.length<8)return toast('Slaptažodis turi būti bent 8 simbolių');if(a!==b)return toast('Slaptažodžiai nesutampa');
+  SALT=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(a,SALT);await saveNow();toast('Slaptažodis įjungtas');settingsPage()},
  pass:async()=>{const a=$('s_p1').value,b=$('s_p2').value;if(a.length<8)return toast('Slaptažodis turi būti bent 8 simbolių');if(a!==b)return toast('Slaptažodžiai nesutampa');
   SALT=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(a,SALT);await saveNow();toast('Slaptažodis pakeistas');settingsPage()},
+ disPass:async()=>{if(!confirm('Išjungti slaptažodį? Programėlė daugiau nebeprašys slaptažodžio.'))return;KEY=await devKey();SALT=null;await saveNow();toast('Slaptažodis išjungtas');settingsPage()},
  clearHist:()=>{if(confirm('Ištrinti visus pokalbius? To atšaukti negalima.')){V.chats=[];newChat();save();toast('Pokalbiai ištrinti')}},
  wipe:async()=>{if(confirm('Ištrinti VISKĄ: raktą, pokalbius, faktus ir nustatymus?')&&confirm('Tikrai? To atšaukti negalima.')){await iclear();localStorage.removeItem('mai_cfg');location.reload()}},
  input:t=>{if(t.id==='s_fs'){cfg.fs=+t.value;$('fsv').textContent=t.value;applyLook();saveCfg()}
@@ -100,7 +109,7 @@ ${cfg.eps.map(x=>`<div class="item${x.id===cfg.ep?' sel':''}" data-act="ep" data
   if(t.id==='s_color'){cfg.accent=t.value;applyLook();saveCfg()}},
  ch:t=>{if(t.id==='s_voice')cfg.voice=t.value;if(t.id==='s_alang')cfg.answerLang=t.value;if(t.id==='s_img')cfg.imgModel=t.value;saveCfg()}})}
 
-/* ===== Importavimas (faktai, nuorodos, priminimai) ===== */
+/* ===== Importavimas ===== */
 $('fImport').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f||!impTarget||!V)return;
  const txt=await f.text(),L=V[impTarget],add=o=>{if(L.length<2000){L.push({id:uid(),on:true,created:Date.now(),...o});n++}};let n=0;
  const un=s=>s.replace(/\\n/gi,' ').replace(/\\([,;\\])/g,'$1').trim();
@@ -116,46 +125,26 @@ $('fImport').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!
   else add({text:l.slice(0,1000)})});
  save();colPage(impTarget);toast('Importuota: '+n)};
 
-/* ===== Užraktas ===== */
+/* ===== Užraktas ir paleistis be slaptažodžio ===== */
+async function devKey(){let k=await iget('devkey');if(!k){k=await crypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);await iset('devkey',k)}return k}
 let hasVault=false,fails=0,waitUntil=0,lastAct=Date.now(),hiddenAt=0;
-function showLock(){$('lock').hidden=false;$('lockPass').value='';$('lockPass2').value='';$('lockErr').textContent='';
- $('lockPass2').hidden=hasVault;$('lockBtn').textContent=hasVault?'Atrakinti':'Sukurti slaptažodį';
- $('lockHint').textContent=hasVault?'Įveskite slaptažodį':'Sukurkite slaptažodį (bent 8 simboliai). Juo bus užšifruoti raktas ir pokalbiai. Jį pamiršus, duomenų atkurti nebus galima.';
- $('lockForgot').hidden=!hasVault}
+function showLock(){$('lock').hidden=false;$('lockPass').value='';$('lockErr').textContent='';
+ $('lockBtn').textContent='Atrakinti';$('lockHint').textContent='Įveskite slaptažodį'}
 async function doUnlock(){const p=$('lockPass').value,err=$('lockErr');
  if(Date.now()<waitUntil){err.textContent='Palaukite '+Math.ceil((waitUntil-Date.now())/1000)+' s';return}
  $('lockBtn').disabled=true;err.textContent='';
- try{if(!hasVault){if(p.length<8)throw new Error('Slaptažodis turi būti bent 8 simbolių');if(p!==$('lockPass2').value)throw new Error('Slaptažodžiai nesutampa');
-   SALT=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(p,SALT);V=blank();await saveNow();hasVault=true}
-  else{const v=await iget('vault');const k=await derive(p,v.salt);let pt;
-   try{pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:v.iv},k,v.ct)}catch{fails++;waitUntil=Date.now()+Math.min(60,2**fails)*1000;throw new Error('Neteisingas slaptažodis')}
-   SALT=v.salt;KEY=k;fails=0;V={...blank(),...JSON.parse(td.decode(pt))}}
-  afterUnlock()}catch(e){err.textContent=e.message}finally{$('lockBtn').disabled=false}}
-function afterUnlock(){$('lock').hidden=true;$('lockPass').value='';$('lockPass2').value='';lastAct=Date.now();
+ try{const v=await iget('vault');const k=await derive(p,v.salt);let pt;
+  try{pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:v.iv},k,v.ct)}catch{fails++;waitUntil=Date.now()+Math.min(60,2**fails)*1000;throw new Error('Neteisingas slaptažodis')}
+  SALT=v.salt;KEY=k;fails=0;V={...blank(),...JSON.parse(td.decode(pt))};afterUnlock()}
+ catch(e){err.textContent=e.message}finally{$('lockBtn').disabled=false}}
+function afterUnlock(){$('lock').hidden=true;$('lockPass').value='';lastAct=Date.now();
  busy=false;applyToggles();upModel();upTemp();newChat();upGo();if(!V.key){toast('Įveskite API raktą');settingsPage()}}
-async function lockNow(){if(!V)return;if(LV.on)liveStop();if(ctrl)ctrl.abort();await saveNow();
+async function lockNow(){if(!V)return;if(!SALT){toast('Slaptažodis išjungtas');return}if(LV.on)liveStop();if(ctrl)ctrl.abort();await saveNow();
  KEY=null;V=null;cur=null;pending=[];imageMode=false;renderPending();closeSheet();closePage();closeDrawer();msgsEl.innerHTML='';showLock()}
 ['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{lastAct=Date.now()},true));
 document.addEventListener('visibilitychange',()=>{if(document.hidden){hiddenAt=Date.now();if(V)saveNow()}
- else if(cfg.f.autolock&&V&&hiddenAt&&Date.now()-hiddenAt>3e5)lockNow()});
-setInterval(()=>{if(cfg.f.autolock&&V&&!busy&&!LV.on&&Date.now()-lastAct>3e5)lockNow()},3e4);
-
-/* ===== Priedas: režimas be slaptažodžio ===== */
-async function devKey(){let k=await iget('devkey');if(!k){k=await crypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);await iset('devkey',k)}return k}
-async function openDevice(v){try{const k=await iget('devkey');const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:v.iv},k,v.ct);KEY=k;SALT=null;fails=0;V={...blank(),...JSON.parse(td.decode(pt))};afterUnlock()}catch{$('lockErr').textContent='Nepavyko atidaryti duomenų'}}
-async function startNoPass(){if(!confirm('Be slaptažodžio programėlę galės atidaryti kiekvienas, kas paims jūsų atrakintą telefoną. Duomenys telefone vis tiek bus užšifruoti. Tęsti?'))return;
- KEY=await devKey();SALT=null;V=blank();await saveNow();hasVault=true;afterUnlock()}
-const _showLock=showLock,_doUnlock=doUnlock,_lockNow=lockNow,_settingsPage=settingsPage;
-const npBtn=document.createElement('button');npBtn.id='lockNoPass';npBtn.className='btn w';npBtn.textContent='Naudoti be slaptažodžio';npBtn.onclick=startNoPass;
-showLock=function(){_showLock();$('lockNoPass').hidden=hasVault;$('lockBtn').after(npBtn);if(hasVault)iget('vault').then(v=>{if(v&&!v.salt)openDevice(v)}).catch(()=>{})};
-doUnlock=async function(){if(hasVault){try{const v=await iget('vault');if(v&&!v.salt)return openDevice(v)}catch{}}return _doUnlock()};
-$('lockBtn').onclick=()=>doUnlock();
-lockNow=async function(){if(V&&!SALT){toast('Programėlė naudojama be slaptažodžio, todėl neužrakinama');return}return _lockNow()};
-settingsPage=function(){_settingsPage();const c=document.createElement('div');c.className='card';
- c.innerHTML=SALT?'<h4>Slaptažodis</h4><div class="row"><div class="t">Įjungtas<small>Programėlė atrakinama slaptažodžiu</small></div><button class="btn" data-act="noPass">Išjungti</button></div>'
- :'<h4>Slaptažodis</h4><div class="row"><div class="t">Išjungtas<small>Norėdami įjungti, aukščiau esančioje skiltyje „Saugumas ir duomenys" įrašykite slaptažodį ir paspauskite „Pakeisti slaptažodį"</small></div></div>';
- pBody.appendChild(c);
- PH.noPass=async()=>{if(!confirm('Išjungti slaptažodį? Programėlę galės atidaryti kiekvienas, kas turi jūsų telefoną.'))return;KEY=await devKey();SALT=null;await saveNow();toast('Slaptažodis išjungtas');settingsPage()}};
+ else if(cfg.f.autolock&&V&&hiddenAt&&Date.now()-hiddenAt>3e5&&SALT)lockNow()});
+setInterval(()=>{if(cfg.f.autolock&&V&&!busy&&!LV.on&&SALT&&Date.now()-lastAct>3e5)lockNow()},3e4);
 
 /* ===== Mygtukai ir įvykiai ===== */
 $('bGo').onclick=()=>{if(busy){if(ctrl)ctrl.abort();return}if(inputEl.value.trim()||pending.length)send();else liveStart()};
@@ -183,17 +172,18 @@ addEventListener('popstate',()=>{if(!sheetEl.hidden)closeSheet();else if(!liveEl
  if(!sheetEl.hidden||!liveEl.hidden||!pageEl.hidden||drawerEl.classList.contains('open'))pushO()});
 if('speechSynthesis' in window)speechSynthesis.onvoiceschanged=()=>{if(curPage==='settings')settingsPage()};
 $('lockBtn').onclick=doUnlock;
-['lockPass','lockPass2'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')doUnlock()}));
+$('lockPass').addEventListener('keydown',e=>{if(e.key==='Enter')doUnlock()});
 
 /* ===== Paleidimas ===== */
 (async()=>{
  ['key','pass','hist','apiKey','passphrase','history','models','ep','endpoint','last','lastModel','lang','baseUrl'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
  applyLook();setIcons();applyToggles();upModel();upGo();
  const fb=document.createElement('button');fb.id='lockForgot';fb.className='btn';fb.style.cssText='background:none;color:var(--mu)';fb.textContent='Pamiršau slaptažodį';
- fb.onclick=async()=>{if(confirm('Bus ištrinta VISKAS: raktas, pokalbiai, faktai. Tęsti?')){await iclear();hasVault=false;showLock()}};
+ fb.onclick=async()=>{if(confirm('Bus ištrinta VISKAS: raktas, pokalbiai, faktai. Tęsti?')){await iclear();hasVault=false;location.reload()}};
  $('lockErr').after(fb);
- try{hasVault=!!(await iget('vault'))}catch{hasVault=false}
- showLock();
+ try{const v=await iget('vault');hasVault=!!v;if(v&&!v.salt){KEY=await devKey();V={...blank(),...JSON.parse(td.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:v.iv},KEY,v.ct)))};SALT=null;afterUnlock();return}}catch{}
+ if(hasVault)showLock();
+ else{KEY=await devKey();SALT=null;V=blank();await saveNow();afterUnlock()}
  try{navigator.storage?.persist?.()}catch{}
  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 })();
