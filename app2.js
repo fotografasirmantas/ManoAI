@@ -201,3 +201,47 @@ $('lockPass').addEventListener('keydown',e=>{if(e.key==='Enter')doUnlock()});
  catch{hasVault=true;showLock();$('lockErr').textContent='Nepavyko atidaryti duomenų. Spauskite „Pamiršau slaptažodį“, kad pradėtumėte iš naujo.'}
 })();
 /* ===== app2.js pabaiga ===== */
+
+/* ===== Pokalbių meniu: ilgas paspaudimas, prisegimas, pervadinimas ===== */
+P.more='<circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/>';
+P.pin='<path d="M12 17v5M9 3h6l-1 6 4 4H6l4-4z"/>';
+(()=>{const s=document.createElement('style');s.textContent='#dList .item{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}#dList .item>.ic{width:16px;height:16px;color:var(--a)}';document.head.appendChild(s)})();
+
+function renderList(){const q=dq.trim().toLowerCase();
+ const L=V.chats.filter(c=>{const fi=c.msgs.flatMap(m=>(m.att||[]).filter(a=>a.kind!=='img')),hasImg=c.msgs.some(m=>(m.att||[]).some(a=>a.kind==='img')||(m.imgs||[]).length);
+  if(fdate&&dayStr(c.created)!==fdate&&!c.msgs.some(m=>dayStr(m.t)===fdate))return false;
+  if(flt.imgs&&!hasImg)return false;if(flt.files&&!fi.length)return false;if(!q)return true;
+  return(flt.title&&c.title.toLowerCase().includes(q))||(flt.text&&c.msgs.some(m=>(m.text||'').toLowerCase().includes(q)))||(flt.files&&fi.some(a=>a.name.toLowerCase().includes(q)))||(!flt.title&&!flt.text&&!flt.files&&c.title.toLowerCase().includes(q))
+ }).sort((a,b)=>(b.pin?1:0)-(a.pin?1:0)||b.updated-a.updated);
+ $('dList').innerHTML=L.map(c=>{const pn=c.projectId&&V.projects.find(p=>p.id===c.projectId);
+  return `<div class="item${cur&&cur.id===c.id?' cur':''}" data-act="open" data-id="${c.id}" data-chat="${c.id}">${c.pin?ic('pin'):''}<span class="t"><span class="tt">${esc(c.title)}</span><small>${fmtD(c.updated)}${pn?' · '+esc(pn.title):''}</small></span><button class="ib" data-act="more" data-id="${c.id}" aria-label="Daugiau">${ic('more')}</button></div>`}).join('')||'<p class="mu" style="padding:12px">Pokalbių nerasta</p>'}
+
+chatMore=function(id){const c=V.chats.find(x=>x.id===id);if(!c)return;
+ try{navigator.vibrate&&navigator.vibrate(15)}catch{}
+ const done=t=>{back();renderList();if(t)toast(t)};
+ openSheet(`<h3>${esc(c.title)}</h3>
+<div class="item" data-act="pin">${ic('pin')}<span class="t">${c.pin?'Atsegti':'Prisegti viršuje'}</span></div>
+<div class="item" data-act="ren">${ic('edit')}<span class="t">Pervadinti</span></div>
+<div class="item" data-act="proj">${ic('folder')}<span class="t">Priskirti projektui</span></div>
+<div class="item" data-act="copy">${ic('copy')}<span class="t">Kopijuoti visą pokalbį</span></div>
+<div class="item" data-act="del" style="color:var(--red)">${ic('trash')}<span class="t">Ištrinti</span></div>`,{
+ pin:()=>{c.pin=!c.pin;save();done(c.pin?'Prisegta':'Atsegta')},
+ ren:()=>{openSheet(`<h3>Pervadinti</h3><input class="in" id="renIn" maxlength="80" value="${esc(c.title)}"><div class="btns"><button class="btn" data-act="no">Atšaukti</button><button class="btn p" data-act="ok">Išsaugoti</button></div>`,{
+   ok:()=>{const n=$('renIn').value.trim();if(!n)return toast('Įrašykite pavadinimą');c.title=n.slice(0,80);save();done('Pervadinta')},no:()=>back()});
+  setTimeout(()=>{const i=$('renIn');if(!i)return;i.focus();i.select();i.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();SH.ok&&SH.ok()}})},60)},
+ proj:()=>openSheet(`<h3>Projektas</h3><div class="list"><div class="item${!c.projectId?' sel':''}" data-act="set" data-id="">${ic('x')}<span class="t">Be projekto</span></div>${V.projects.map(p=>`<div class="item${c.projectId===p.id?' sel':''}" data-act="set" data-id="${p.id}">${ic('folder')}<span class="t">${esc(p.title)}</span></div>`).join('')}</div>${V.projects.length?'':'<p class="mu" style="padding:8px 12px">Projektų dar nėra. Juos sukursite meniu → Projektai.</p>'}`,
+   {set:pid=>{c.projectId=pid||null;save();done('Išsaugota')}}),
+ copy:()=>{const t=c.msgs.filter(m=>!m.loading).map(m=>(m.role==='user'?'Aš: ':'AI: ')+plain(m.text||'')).join('\n\n');
+  navigator.clipboard?.writeText(t).then(()=>done('Pokalbis nukopijuotas'),()=>toast('Nepavyko nukopijuoti'))},
+ del:()=>openSheet(`<h3>Ištrinti pokalbį?</h3><p class="mu" style="margin:0 4px 8px">„${esc(c.title)}“ bus ištrintas visam laikui.</p><div class="btns"><button class="btn" data-act="no">Atšaukti</button><button class="btn d" data-act="ok">Ištrinti</button></div>`,{
+   ok:()=>{V.chats=V.chats.filter(x=>x!==c);if(cur===c)newChat();save();done('Ištrinta')},no:()=>back()})})};
+
+/* Ilgas paspaudimas ant pokalbio */
+let lpT=0,lpDone=false,lpX=0,lpY=0;
+drawerEl.addEventListener('pointerdown',e=>{lpDone=false;const it=e.target.closest('[data-chat]');if(!it||e.target.closest('[data-act="more"]'))return;
+ lpX=e.clientX;lpY=e.clientY;clearTimeout(lpT);lpT=setTimeout(()=>{lpDone=true;chatMore(it.dataset.chat)},500)});
+['pointerup','pointercancel'].forEach(ev=>drawerEl.addEventListener(ev,()=>clearTimeout(lpT)));
+drawerEl.addEventListener('pointermove',e=>{if(Math.abs(e.clientX-lpX)>10||Math.abs(e.clientY-lpY)>10)clearTimeout(lpT)});
+drawerEl.addEventListener('contextmenu',e=>{const it=e.target.closest('[data-chat]');if(!it)return;e.preventDefault();clearTimeout(lpT);if(!lpDone){lpDone=true;chatMore(it.dataset.chat)}});
+drawerEl.addEventListener('click',e=>{if(lpDone){lpDone=false;e.stopImmediatePropagation();e.preventDefault()}},true);
+/* ===== Pokalbių meniu pabaiga ===== */
