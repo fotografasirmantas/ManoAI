@@ -1,6 +1,6 @@
 'use strict';
 /* Mano AI, 2 dalis. Veikia tik kartu su app.js */
-const APP_VER='v10';
+const APP_VER='v1.0';
 const okUrl=u=>/^https:\/\/anymodel\.org\/\S*$/.test(u)||/^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}):\d+\/\S*$/.test(u);
 const URLMSG='Adresas turi prasidėti https://anymodel.org/ arba http://localhost / http://192.168.x.x (lokalūs serveriai)';
 const back=()=>{if(history.state&&history.state.o)history.back();else{closeSheet();closePage();closeDrawer();if(LV.on)liveStop()}};
