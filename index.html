@@ -4,11 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: data:; connect-src 'self' https://anymodel.org https://cdnjs.cloudflare.com https://*.wikipedia.org https://api.tavily.com https://r.jina.ai; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
-
 <meta name="theme-color" content="#ffffff">
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-512.png">
 <link rel="apple-touch-icon" href="icon-512.png">
 <link rel="stylesheet" href="style.css">
+<style>
+.item .t{overflow:hidden}
+.item .tt,.item small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item>.ib{flex:none}
+</style>
 <title>Mano AI</title>
 </head>
 <body>
@@ -61,7 +66,7 @@
   </div>
 </div>
 
-<div id="lock" class="lock">
+<div id="lock" class="lock" hidden>
   <div class="lockbox">
     <div id="lockLogo" class="logo"></div>
     <h1 id="lockTitle">Mano AI</h1>
@@ -73,7 +78,8 @@
   </div>
 </div>
 
-<script src="klaidos.js"></script><script src="app.js"></script><script src="app2.js"></script><script src="balsas.js"></script><script src="failai.js"></script><script src="garsas.js"></script><script src="pdftekstas.js"></script><script src="sutvarkymas.js"></script><script src="garsas2.js"></script><script src="balsas2.js"></script><script src="vaizdai.js"></script><script src="paieska.js"></script><script src="kopija.js"></script>
+<div id="toast" class="toast"></div>
 
+<script src="klaidos.js"></script><script src="app.js"></script><script src="app2.js"></script><script src="balsas.js"></script><script src="failai.js"></script><script src="garsas.js"></script><script src="pdftekstas.js"></script><script src="sutvarkymas.js"></script><script src="garsas2.js"></script><script src="balsas2.js"></script><script src="vaizdai.js"></script><script src="paieska.js"></script><script src="kopija.js"></script>
 </body>
 </html>
