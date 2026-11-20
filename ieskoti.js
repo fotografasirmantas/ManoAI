@@ -1,5 +1,5 @@
 'use strict';
-/* Mano AI: paieška. Pirma nemokamai (Google, DuckDuckGo, Bing, Mojeek), nepavykus – AnyModel /v1/search. Įkelti po paieska.js */
+/* Mano AI: paieška. Pirma nemokamai (Bing, DuckDuckGo, Mojeek, Google), nepavykus – AnyModel /v1/search. Įkelti po paieska.js */
 (()=>{
 cfg.webProv='url';
 if(cfg.f.amSearch===undefined)cfg.f.amSearch=true;
